@@ -1,0 +1,529 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Live Camera Detection</h2>
+<div class="card bg-secondary mb-4">
+  <div class="card-body">
+    <form id="camera-form" class="row g-3 align-items-end">
+      <div class="col-md-5">
+        <label class="form-label" for="cameraUrl">Camera source</label>
+        <select class="form-select" id="cameraUrl" name="url">
+          <option value="0" data-mode="local" selected>PC Camera (default)</option>
+          {% for source in sources %}
+          <option value="{{ source.url }}" data-mode="{{ source.type }}">{{ source.name }} ({{ source.type }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="button" id="openCameraButton" class="btn btn-outline-light w-100">Start Camera</button>
+      </div>
+      <div class="col-md-2">
+        <button type="button" id="stopCameraButton" class="btn btn-danger w-100" disabled>Stop Camera</button>
+      </div>
+      <div class="col-md-2">
+        <button type="button" id="scanButton" class="btn btn-primary w-100">Scan Frame</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="card bg-dark mb-4">
+  <div class="card-body">
+    <form method="post" class="row g-3 align-items-end">
+      <input type="hidden" name="action" value="add-camera">
+      <div class="col-md-4">
+        <label class="form-label" for="cameraName">Camera name</label>
+        <input class="form-control" id="cameraName" name="camera_name" placeholder="Gate-01">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="cameraType">Type</label>
+        <select class="form-select" id="cameraType" name="camera_type">
+          <option value="local">Local</option>
+          <option value="ip" selected>IP</option>
+          <option value="rtsp">RTSP</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label" for="cameraUrlInput">Camera URL</label>
+        <input class="form-control" id="cameraUrlInput" name="camera_url" placeholder="http://192.168.1.100/mjpg">
+      </div>
+      <div class="col-md-1">
+        <button class="btn btn-outline-light w-100" type="submit">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card bg-dark text-light p-3">
+      <h5>Live Preview</h5>
+      <div class="preview-shell">
+        <video id="preview" autoplay muted playsinline></video>
+        <div id="previewBadge" class="preview-badge">Preview idle</div>
+      </div>
+      <div id="cameraNotice" class="form-text text-warning mt-2">Local webcam preview requires HTTPS or localhost in modern browsers.</div>
+      <div id="cameraActions" class="mt-2"></div>
+      <div class="mt-3">
+        <h6>Annotated Detection</h6>
+        <img id="annotatedImage" class="img-fluid rounded mt-2" alt="Annotated detection" />
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-5">
+    <div id="liveResult" class="card bg-secondary p-3">
+      <h5>Live Dashboard</h5>
+      <div id="liveStatus" class="mb-3">No scan yet.</div>
+      <div class="mb-3">
+        <label for="scanNote" class="form-label">Vehicle note</label>
+        <input id="scanNote" class="form-control form-control-sm" type="text" placeholder="Add a note (e.g. VIP, staff, suspicious)">
+      </div>
+      <div class="mb-3 d-flex gap-2">
+        <input id="lookupPlateInput" class="form-control form-control-sm" type="text" placeholder="Enter plate for CarInfo lookup">
+        <button id="lookupCarInfoBtn" type="button" class="btn btn-sm btn-outline-light" disabled>Lookup CarInfo</button>
+      </div>
+      <div id="liveDetails" class="mt-3"></div>
+      <div id="vehicleInfo" class="mt-3"></div>
+      <div id="blacklistAlert" class="mt-3"></div>
+      <div id="gateState" class="mt-3"></div>
+      <div class="mt-4">
+        <h6>Live Scan History</h6>
+        <ul id="historyList" class="list-group small"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const scanButton = document.getElementById('scanButton');
+const openCameraButton = document.getElementById('openCameraButton');
+const stopCameraButton = document.getElementById('stopCameraButton');
+const cameraUrl = document.getElementById('cameraUrl');
+const liveStatus = document.getElementById('liveStatus');
+const liveDetails = document.getElementById('liveDetails');
+const blacklistAlert = document.getElementById('blacklistAlert');
+const gateState = document.getElementById('gateState');
+const preview = document.getElementById('preview');
+const previewBadge = document.getElementById('previewBadge');
+const cameraNotice = document.getElementById('cameraNotice');
+const cameraActions = document.getElementById('cameraActions');
+const historyList = document.getElementById('historyList');
+const annotatedImage = document.getElementById('annotatedImage');
+const lookupPlateInput = document.getElementById('lookupPlateInput');
+const lookupCarInfoBtn = document.getElementById('lookupCarInfoBtn');
+const isSecureOrigin = window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+let autoScanInterval = null;
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function stopPreviewStream() {
+  if (preview.srcObject && typeof preview.srcObject.getTracks === 'function') {
+    preview.srcObject.getTracks().forEach((track) => track.stop());
+  }
+  preview.srcObject = null;
+}
+
+function getSelectedCameraMode() {
+  const selected = cameraUrl.selectedOptions[0];
+  return selected ? selected.dataset.mode : 'local';
+}
+
+function updatePreviewControls() {
+  const mode = getSelectedCameraMode();
+  if (!isSecureOrigin) {
+    // Show helpful actions: link to open same page on localhost and a try button
+    const localhostUrl = `http://localhost:${window.location.port || '5000'}${window.location.pathname}`;
+    cameraActions.innerHTML = `
+      <div class="small text-muted">Webcam access requires a secure origin.</div>
+      <a href="${localhostUrl}" class="btn btn-sm btn-outline-light me-2">Open via localhost</a>
+      <button id="tryPreviewBtn" class="btn btn-sm btn-outline-warning">Try preview anyway</button>
+    `;
+    openCameraButton.disabled = true;
+    stopCameraButton.disabled = true;
+    previewBadge.textContent = 'Camera blocked on insecure origin';
+    cameraNotice.innerHTML = 'Local webcam preview requires HTTPS or localhost.';
+    liveStatus.innerHTML = '<div class="alert alert-danger">Browser webcam access is blocked for this origin. Use localhost or HTTPS.</div>';
+    stopPreviewStream();
+    stopAutoScan();
+    // attach try button handler after DOM insertion
+    setTimeout(() => {
+      const tryBtn = document.getElementById('tryPreviewBtn');
+      if (tryBtn) tryBtn.addEventListener('click', () => openPreview());
+    }, 10);
+    return;
+  }
+
+  cameraActions.innerHTML = '';
+  cameraNotice.textContent = 'Local webcam preview requires HTTPS or localhost in modern browsers.';
+
+  if (mode !== 'local') {
+    openCameraButton.disabled = true;
+    stopCameraButton.disabled = true;
+    previewBadge.textContent = 'Local preview unavailable for remote streams';
+    liveStatus.innerHTML = '<div class="alert alert-info">Select the remote source and click Scan Frame to capture a frame from the backend.</div>';
+    stopPreviewStream();
+    stopAutoScan();
+  } else {
+    openCameraButton.disabled = false;
+    stopCameraButton.disabled = true;
+    previewBadge.textContent = 'Local webcam preview is available';
+    liveStatus.innerHTML = '<div class="alert alert-info">Click Start Camera to open the webcam.</div>';
+  }
+}
+
+async function openPreview() {
+  const mode = getSelectedCameraMode();
+  if (mode !== 'local') {
+    previewBadge.textContent = 'Preview not available for remote streams';
+    liveStatus.innerHTML = '<div class="alert alert-warning">Remote sources cannot be previewed in the browser. Use Scan Frame instead.</div>';
+    return;
+  }
+
+  stopPreviewStream();
+  preview.src = '';
+  previewBadge.textContent = 'Opening PC camera...';
+  liveStatus.innerHTML = '<div class="alert alert-info">Requesting camera access...</div>';
+
+  if (!isSecureOrigin) {
+    previewBadge.textContent = 'Camera blocked on insecure origin';
+    liveStatus.innerHTML = '<div class="alert alert-danger">Local webcam access requires HTTPS or localhost. Open the page at http://localhost:5000/live-camera.</div>';
+    return;
+  }
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    const fallback = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    if (!fallback) {
+      previewBadge.textContent = 'Camera API not supported';
+      liveStatus.innerHTML = '<div class="alert alert-danger">This browser does not support webcam access.</div>';
+      return;
+    }
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'user' },
+      audio: false,
+    });
+    preview.srcObject = stream;
+    await preview.play();
+    previewBadge.textContent = 'PC camera live';
+    liveStatus.innerHTML = '<div class="alert alert-success">Camera is live. Auto-scanning every 3 seconds.</div>';
+    stopCameraButton.disabled = false;
+    openCameraButton.disabled = true;
+    startAutoScan();
+  } catch (error) {
+    console.warn('Unable to open PC camera:', error);
+    previewBadge.textContent = 'Unable to open PC camera';
+    const message = error?.name === 'NotAllowedError'
+      ? 'Camera permission was blocked. Please allow camera access in the browser.'
+      : 'Camera could not be started. Make sure your laptop camera is available and not in use by another app.';
+    liveStatus.innerHTML = `<div class="alert alert-danger">${escapeHtml(message)}</div>`;
+    stopAutoScan();
+  }
+}
+
+function stopCamera() {
+  stopAutoScan();
+  stopPreviewStream();
+  previewBadge.textContent = 'Preview stopped';
+  liveStatus.innerHTML = '<div class="alert alert-warning">Camera stopped. Click Start Camera to resume.</div>';
+  stopCameraButton.disabled = true;
+  openCameraButton.disabled = false;
+}
+
+function startAutoScan() {
+  if (autoScanInterval) {
+    return;
+  }
+  autoScanInterval = setInterval(async () => {
+    if (!preview.srcObject || preview.videoWidth === 0 || preview.videoHeight === 0) {
+      return;
+    }
+    const form = new FormData();
+    form.append('url', cameraUrl.value);
+    const frameData = await captureFrame();
+    if (!frameData) {
+      return;
+    }
+    form.append('frame_data', frameData);
+    const noteField = document.getElementById('scanNote');
+    if (noteField) {
+      form.append('note', noteField.value.trim());
+    }
+    try {
+      const response = await fetch('/api/live-detect', { method: 'POST', body: form });
+      const data = await response.json();
+      updateResult(data);
+      await loadHistory();
+    } catch (error) {
+      liveStatus.innerHTML = `<div class="alert alert-danger">${escapeHtml(error.message || 'Auto scan failed')}</div>`;
+    }
+  }, 3000);
+}
+
+function stopAutoScan() {
+  if (autoScanInterval) {
+    clearInterval(autoScanInterval);
+    autoScanInterval = null;
+  }
+}
+
+async function captureFrame() {
+  if (!preview.srcObject || preview.videoWidth === 0 || preview.videoHeight === 0) {
+    return null;
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = preview.videoWidth;
+  canvas.height = preview.videoHeight;
+  const context = canvas.getContext('2d');
+  if (!context) {
+    return null;
+  }
+  context.drawImage(preview, 0, 0, canvas.width, canvas.height);
+  return canvas.toDataURL('image/jpeg', 0.9);
+}
+
+async function loadHistory() {
+  try {
+    const response = await fetch('/api/live-scan-history');
+    const events = await response.json();
+    if (!Array.isArray(events) || !events.length) {
+      historyList.innerHTML = '<li class="list-group-item">No live scans yet.</li>';
+      return;
+    }
+    historyList.innerHTML = events.map((event) => {
+      const gateLabel = event.gate_open ? 'Gate opened' : 'Gate closed';
+      return `
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong>${escapeHtml(event.plate_number || 'Unknown')}</strong>
+            <span class="badge ${event.gate_open ? 'bg-success' : 'bg-warning text-dark'}">${escapeHtml(gateLabel)}</span>
+          </div>
+          <div class="small text-muted mt-1">
+            ${escapeHtml(event.vehicle_type || 'Unknown')} • Plate Conf: ${escapeHtml(Number(event.plate_confidence || 0).toFixed(1))}%
+          </div>
+          <div class="text-muted mt-1">${escapeHtml(event.camera_name || event.source_url || 'Camera')} • ${escapeHtml(event.status || 'Unknown')}</div>
+          <div class="text-muted mt-1">${escapeHtml(event.created_at || '')}</div>
+          ${event.note ? `<div class="text-muted mt-1"><strong>Note:</strong> ${escapeHtml(event.note)}</div>` : ''}
+        </li>`;
+    }).join('');
+  } catch (error) {
+    console.warn('Unable to load history:', error);
+  }
+}
+
+scanButton.addEventListener('click', async () => {
+  const mode = getSelectedCameraMode();
+  liveStatus.innerHTML = '<div class="alert alert-info">Scanning...</div>';
+  gateState.innerHTML = '';
+  const form = new FormData();
+  form.append('url', cameraUrl.value);
+
+  if (mode === 'local') {
+    const frameData = await captureFrame();
+    if (!frameData) {
+      liveStatus.innerHTML = '<div class="alert alert-warning">Please start the webcam before scanning a frame.</div>';
+      return;
+    }
+    form.append('frame_data', frameData);
+  }
+
+  try {
+    const noteField = document.getElementById('scanNote');
+    if (noteField) {
+      form.append('note', noteField.value.trim());
+    }
+    const response = await fetch('/api/live-detect', { method: 'POST', body: form });
+    const data = await response.json();
+    updateResult(data);
+    await loadHistory();
+  } catch (error) {
+    liveStatus.innerHTML = `<div class="alert alert-danger">${escapeHtml(error.message || 'Scan failed')}</div>`;
+  }
+});
+
+openCameraButton.addEventListener('click', async () => {
+  await openPreview();
+});
+stopCameraButton.addEventListener('click', () => {
+  stopCamera();
+});
+
+cameraUrl.addEventListener('change', () => {
+  updatePreviewControls();
+});
+
+window.addEventListener('load', async () => {
+  updatePreviewControls();
+  updateLookupButton();
+  if (getSelectedCameraMode() === 'local') {
+    if (isSecureOrigin) {
+      await openPreview();
+    }
+  }
+});
+
+lookupPlateInput.addEventListener('input', updateLookupButton);
+lookupCarInfoBtn.addEventListener('click', async () => {
+  const plate = lookupPlateInput.value.trim();
+  if (!plate) {
+    return;
+  }
+  lookupCarInfoBtn.disabled = true;
+  lookupCarInfoBtn.textContent = 'Looking up...';
+  try {
+    const response = await fetch(`/api/carinfo/${encodeURIComponent(plate)}`);
+    const data = await response.json();
+    if (response.ok && data.vehicle_info) {
+      lookupCarInfoBtn.textContent = 'Lookup CarInfo';
+      renderCarInfo(data.vehicle_info, plate);
+    } else {
+      lookupCarInfoBtn.textContent = 'Lookup CarInfo';
+      liveStatus.innerHTML = `<div class="alert alert-warning">${escapeHtml(data.error || 'CarInfo not found')}</div>`;
+    }
+  } catch (error) {
+    lookupCarInfoBtn.textContent = 'Lookup CarInfo';
+    liveStatus.innerHTML = `<div class="alert alert-danger">${escapeHtml(error.message || 'CarInfo lookup failed')}</div>`;
+  } finally {
+    updateLookupButton();
+  }
+});
+
+function updateLookupButton() {
+  const hasText = lookupPlateInput.value.trim().length > 0;
+  lookupCarInfoBtn.disabled = !hasText;
+}
+
+function renderCarInfo(vehicleRecord, plate) {
+  const display = {
+    plate_number: vehicleRecord.plate_number || plate,
+    owner_name: vehicleRecord.owner_name || 'Unknown',
+    vehicle_type: vehicleRecord.vehicle_type || 'Unknown',
+    manufacturer: vehicleRecord.manufacturer || 'Unknown',
+    model: vehicleRecord.model || vehicleRecord.variant || 'Unknown',
+    vehicle_color: vehicleRecord.vehicle_color || 'Unknown',
+    fuel_type: vehicleRecord.fuel_type || 'Unknown',
+    registration_state: vehicleRecord.registration_state || 'Unknown',
+    registration_date: vehicleRecord.registration_date || 'Unknown',
+    insurance_status: vehicleRecord.insurance_status || 'Unknown',
+    puc_status: vehicleRecord.puc_status || 'Unknown',
+    fastag_status: vehicleRecord.fastag_status || 'Unknown',
+    fastag_balance: vehicleRecord.fastag_balance ?? 0,
+    state: vehicleRecord.state || 'Unknown',
+    city: vehicleRecord.city || 'Unknown',
+  };
+
+  document.getElementById('liveDetails').innerHTML = `
+    <p><strong>Plate:</strong> ${escapeHtml(display.plate_number)}</p>
+    <p><strong>Owner:</strong> ${escapeHtml(display.owner_name)}</p>
+    <p><strong>Vehicle Type:</strong> ${escapeHtml(display.vehicle_type)}</p>
+    <p><strong>Manufacturer:</strong> ${escapeHtml(display.manufacturer)}</p>
+    <p><strong>Model:</strong> ${escapeHtml(display.model)}</p>
+    <p><strong>Color:</strong> ${escapeHtml(display.vehicle_color)}</p>
+    <p><strong>Fuel:</strong> ${escapeHtml(display.fuel_type)}</p>
+    <p><strong>Registration State:</strong> ${escapeHtml(display.registration_state)}</p>
+    <p><strong>Registration Date:</strong> ${escapeHtml(display.registration_date)}</p>
+    <p><strong>Insurance:</strong> ${escapeHtml(display.insurance_status)}</p>
+    <p><strong>PUC:</strong> ${escapeHtml(display.puc_status)}</p>
+    <p><strong>FASTag:</strong> ${escapeHtml(display.fastag_status)}</p>
+    <p><strong>Balance:</strong> ₹${escapeHtml(display.fastag_balance)}</p>
+    <p><strong>State:</strong> ${escapeHtml(display.state)}</p>
+    <p><strong>City:</strong> ${escapeHtml(display.city)}</p>
+  `;
+}
+
+function updateResult(data) {
+  if (data.error) {
+    liveStatus.innerHTML = `<div class="alert alert-danger">${escapeHtml(data.error)}</div>`;
+    gateState.innerHTML = '';
+    blacklistAlert.innerHTML = '';
+    annotatedImage.src = '';
+    document.getElementById('vehicleInfo').innerHTML = '';
+    return;
+  }
+
+  const isBlacklisted = !!data.blacklist;
+  const cardClass = isBlacklisted ? 'alert-danger' : 'alert-success';
+  liveStatus.innerHTML = `<div class="alert ${cardClass}">${escapeHtml(data.status || 'Scan complete')}</div>`;
+  liveDetails.innerHTML = `
+    <p><strong>Plate:</strong> ${escapeHtml(data.plate?.text || 'N/A')}</p>
+    <p><strong>Vehicle:</strong> ${escapeHtml(data.vehicle?.label || 'Unknown')}</p>
+    <p><strong>Detection Confidence:</strong> ${escapeHtml(data.vehicle?.confidence || 0)}%</p>
+    <p><strong>Plate Confidence:</strong> ${escapeHtml(data.plate?.confidence || 0)}%</p>
+    <p><strong>FPS:</strong> ${escapeHtml(data.fps?.toFixed ? data.fps.toFixed(1) : data.fps || 0)}</p>
+    <p><strong>Detected:</strong> ${escapeHtml(data.detection_time || new Date().toLocaleString())}</p>
+    <p><strong>Note:</strong> ${escapeHtml(data.note || 'None')}</p>
+  `;
+  annotatedImage.src = data.annotated_image || '';
+
+  const vehicleRecord = data.vehicle_record || {};
+  document.getElementById('vehicleInfo').innerHTML = (vehicleRecord.plate_number || vehicleRecord.owner_name) ? `
+    <div class="card bg-dark text-light p-3">
+      <h6>CarInfo / RTO Vehicle Information</h6>
+      <div class="small">
+        <div><strong>Plate Number :</strong> ${escapeHtml(vehicleRecord.plate_number || data.plate?.text || 'N/A')}</div>
+        <div><strong>Owner :</strong> ${escapeHtml(vehicleRecord.owner_name || 'Unknown')}</div>
+        <div><strong>Vehicle Type :</strong> ${escapeHtml(vehicleRecord.vehicle_type || data.vehicle?.label || 'Unknown')}</div>
+        <div><strong>Manufacturer :</strong> ${escapeHtml(vehicleRecord.manufacturer || 'Unknown')}</div>
+        <div><strong>Model :</strong> ${escapeHtml(vehicleRecord.model || vehicleRecord.variant || 'Unknown')}</div>
+        <div><strong>Color :</strong> ${escapeHtml(vehicleRecord.vehicle_color || 'Unknown')}</div>
+        <div><strong>Fuel :</strong> ${escapeHtml(vehicleRecord.fuel_type || 'Unknown')}</div>
+        <div><strong>Registration State :</strong> ${escapeHtml(vehicleRecord.registration_state || 'Unknown')}</div>
+        <div><strong>Registration Date :</strong> ${escapeHtml(vehicleRecord.registration_date || 'Unknown')}</div>
+        <div><strong>Insurance :</strong> ${escapeHtml(vehicleRecord.insurance_status || 'Unknown')}</div>
+        <div><strong>PUC :</strong> ${escapeHtml(vehicleRecord.puc_status || 'Unknown')}</div>
+        <div><strong>FASTag :</strong> ${escapeHtml(vehicleRecord.fastag_status || 'Unknown')}</div>
+        <div><strong>Balance :</strong> ₹${escapeHtml(vehicleRecord.fastag_balance ?? 0)}</div>
+        <div><strong>State :</strong> ${escapeHtml(vehicleRecord.state || 'Unknown')}</div>
+        <div><strong>City :</strong> ${escapeHtml(vehicleRecord.city || 'Unknown')}</div>
+        <div><strong>Detection Time :</strong> ${escapeHtml(data.detection_time || new Date().toLocaleString())}</div>
+      </div>
+    </div>
+  ` : '<div class="alert alert-secondary">No CarInfo/RTO details found for this plate.</div>';
+
+  if (isBlacklisted) {
+    blacklistAlert.innerHTML = `
+      <div class="alert alert-danger">
+        <strong>⚠ BLACKLISTED VEHICLE DETECTED</strong><br>
+        Plate: ${escapeHtml(data.plate?.text || 'N/A')}<br>
+        Reason: ${escapeHtml(data.blacklist.reason || 'Unknown')}<br>
+        Camera: ${escapeHtml(data.vehicle?.camera_name || 'Live Camera')}<br>
+        Time: ${new Date().toLocaleTimeString()}
+      </div>`;
+  } else {
+    blacklistAlert.innerHTML = '';
+  }
+
+  if (data.gate_open) {
+    gateState.innerHTML = `
+      <div class="gate-card gate-open">
+        <div class="gate-bars">
+          <div class="gate-bar"></div>
+          <div class="gate-bar"></div>
+        </div>
+        <div>
+          <strong>Gate opened</strong>
+          <div class="text-muted">Vehicle approved and access granted.</div>
+        </div>
+      </div>`;
+  } else {
+    gateState.innerHTML = `
+      <div class="gate-card gate-closed">
+        <div class="gate-bars">
+          <div class="gate-bar"></div>
+          <div class="gate-bar"></div>
+        </div>
+        <div>
+          <strong>Gate closed</strong>
+          <div class="text-muted">Access denied or no valid vehicle.</div>
+        </div>
+      </div>`;
+  }
+}
+
+loadHistory();
+</script>
+{% endblock %}

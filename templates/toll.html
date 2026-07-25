@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Toll Plaza Simulation</h2>
+<form class="row g-3 mb-4" method="post">
+  <div class="col-md-6"><input class="form-control" name="plate_number" placeholder="Enter plate number"></div>
+  <div class="col-md-6"><button class="btn btn-success" type="submit">Process Toll</button></div>
+</form>
+{% if vehicle %}
+<div class="card bg-secondary mb-4">
+  <div class="card-body">
+    <h5 class="card-title">Transaction Summary</h5>
+    <p><strong>Vehicle:</strong> {{ vehicle.plate_number }} ({{ vehicle.vehicle_type }})</p>
+    <p><strong>Owner:</strong> {{ vehicle.owner_name }}</p>
+    <p><strong>FASTag Balance Before:</strong> {{ balance_before }}</p>
+    <p><strong>Toll Amount:</strong> {{ toll_amount }}</p>
+    <p><strong>Balance After:</strong> {{ balance_after }}</p>
+    <p><strong>Status:</strong> {{ status }}</p>
+    <p><strong>Transaction ID:</strong> {{ transaction_id }}</p>
+  </div>
+</div>
+{% endif %}
+<div class="card bg-secondary">
+  <div class="card-body">
+    <h5 class="card-title">Recent Toll Transactions</h5>
+    <table class="table table-dark table-striped">
+      <thead><tr><th>ID</th><th>Vehicle</th><th>Balance Before</th><th>Toll</th><th>Balance After</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for tx in transactions %}
+        <tr><td>{{ tx.transaction_id }}</td><td>{{ tx.vehicle_number }}</td><td>{{ tx.fastag_balance_before }}</td><td>{{ tx.toll_amount }}</td><td>{{ tx.balance_after }}</td><td>{{ tx.status }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

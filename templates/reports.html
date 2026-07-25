@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Reports</h2>
+<div class="mb-3">
+  <a class="btn btn-outline-light" href="{{ url_for('export_reports', format='csv', period=period) }}">Export CSV</a>
+  <a class="btn btn-outline-light" href="{{ url_for('export_reports', format='xlsx', period=period) }}">Export Excel</a>
+  <a class="btn btn-outline-light" href="{{ url_for('export_reports', format='pdf', period=period) }}">Export PDF</a>
+</div>
+<div class="card bg-secondary">
+  <div class="card-body">
+    <table class="table table-dark table-striped">
+      <thead><tr><th>Period</th><th>Count</th></tr></thead>
+      <tbody>
+        {% for row in rows %}
+        <tr><td>{{ row.period }}</td><td>{{ row.count }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

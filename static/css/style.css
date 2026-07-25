@@ -1,0 +1,92 @@
+body {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #111827, #1f2937);
+  color: #f9fafb;
+}
+.sidebar {
+  min-height: 100vh;
+  background: #111827;
+  border-right: 1px solid #374151;
+}
+.sidebar .nav-link {
+  color: #f9fafb;
+}
+.card {
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+.table-dark {
+  --bs-table-bg: #1f2937;
+}
+.preview-shell {
+  position: relative;
+  min-height: 320px;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #000;
+}
+#preview {
+  width: 100%;
+  min-height: 320px;
+  object-fit: cover;
+  background: #000;
+}
+.preview-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.8);
+  color: #f9fafb;
+  font-size: 0.85rem;
+}
+.gate-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
+.gate-bars {
+  display: flex;
+  gap: 0.45rem;
+}
+.gate-bar {
+  width: 14px;
+  height: 70px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f59e0b, #b45309);
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+.gate-card.gate-open .gate-bar {
+  background: linear-gradient(180deg, #34d399, #059669);
+  transform: translateY(-4px);
+}
+.gate-card.gate-closed .gate-bar {
+  transform: translateY(4px);
+}
+.gate-card.gate-closed .gate-bar:nth-child(2) {
+  transform: translateY(8px);
+}
+
+#vehicleInfo {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+#vehicleInfo .card {
+  background: rgba(31, 41, 55, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+#vehicleInfo .card h6 {
+  margin-bottom: 0.75rem;
+}
+
+#vehicleInfo .small > div {
+  margin-bottom: 0.45rem;
+}
+

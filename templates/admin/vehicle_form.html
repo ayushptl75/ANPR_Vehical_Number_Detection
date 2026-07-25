@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ 'Edit Vehicle' if vehicle else 'Add Vehicle' }}</h2>
+<form method="post">
+  <div class="mb-3">
+    <label class="form-label">Registration Number</label>
+    <input name="plate_number" class="form-control" value="{{ vehicle.plate_number if vehicle else '' }}" {% if vehicle %}readonly{% endif %} required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Owner Name</label>
+    <input name="owner_name" class="form-control" value="{{ vehicle.owner_name if vehicle else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Vehicle Type</label>
+    <input name="vehicle_type" class="form-control" value="{{ vehicle.vehicle_type if vehicle else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Manufacturer</label>
+    <input name="manufacturer" class="form-control" value="{{ vehicle.manufacturer if vehicle else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Model</label>
+    <input name="model" class="form-control" value="{{ vehicle.model if vehicle else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Fuel Type</label>
+    <input name="fuel_type" class="form-control" value="{{ vehicle.fuel_type if vehicle else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Registration Date</label>
+    <input name="registration_date" class="form-control" value="{{ vehicle.registration_date if vehicle else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Insurance Status</label>
+    <input name="insurance_status" class="form-control" value="{{ vehicle.insurance_status if vehicle else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Insurance Expiry</label>
+    <input name="insurance_expiry" class="form-control" value="{{ vehicle.insurance_expiry if vehicle else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">PUC Status</label>
+    <input name="puc_status" class="form-control" value="{{ vehicle.puc_status if vehicle else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">PUC Expiry</label>
+    <input name="puc_expiry" class="form-control" value="{{ vehicle.puc_expiry if vehicle else '' }}">
+  </div>
+  <button class="btn btn-primary">Save</button>
+  <a class="btn btn-secondary" href="{{ url_for('vehicle_bp.list_vehicles') }}">Cancel</a>
+</form>
+{% endblock %}

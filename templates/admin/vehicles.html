@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Vehicle Registry</h2>
+<div class="mb-3">
+  <form class="row g-2" method="get" action="{{ url_for('vehicle_bp.list_vehicles') }}">
+    <div class="col-auto"><input name="q" value="{{ query }}" class="form-control" placeholder="Search registration"></div>
+    <div class="col-auto"><button class="btn btn-primary">Search</button></div>
+    <div class="col-auto"><a href="{{ url_for('vehicle_bp.add_vehicle') }}" class="btn btn-success">Add Vehicle</a></div>
+  </form>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr><th>Plate</th><th>Owner</th><th>Type</th><th>Manufacturer</th><th>Model</th><th>Actions</th></tr>
+  </thead>
+  <tbody>
+    {% for v in vehicles %}
+    <tr>
+      <td>{{ v.plate_number }}</td>
+      <td>{{ v.owner_name or 'Not Available' }}</td>
+      <td>{{ v.vehicle_type or 'Unknown' }}</td>
+      <td>{{ v.manufacturer or '' }}</td>
+      <td>{{ v.model or v.variant or '' }}</td>
+      <td>
+        <a href="{{ url_for('vehicle_bp.edit_vehicle', plate=v.plate_number) }}" class="btn btn-sm btn-primary">Edit</a>
+        <form method="post" action="{{ url_for('vehicle_bp.delete_vehicle', plate=v.plate_number) }}" style="display:inline" onsubmit="return confirm('Delete vehicle?');">
+          <button class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

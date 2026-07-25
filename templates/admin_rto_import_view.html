@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">RTO Import #{{ rec.id }}</h2>
+<div class="card bg-secondary p-3">
+  <h5>Payload</h5>
+  <pre class="bg-dark p-3">{{ payload|tojson(indent=2) }}</pre>
+  <a class="btn btn-success" href="{{ url_for('approve_rto_import', import_id=rec.id) }}">Approve</a>
+  <a class="btn btn-secondary" href="{{ url_for('admin_rto_imports') }}">Back</a>
+</div>
+{% endblock %}

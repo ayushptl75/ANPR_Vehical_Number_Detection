@@ -1,0 +1,36 @@
+2026-07-15 23:21:21,298 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-15 23:21:24,817 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-15 23:22:21,251 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-15 23:35:30,063 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-15 23:58:43,910 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-16 00:04:51,322 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-16 00:14:00,941 INFO authenticate_user: username 'admin3' not found
+2026-07-16 00:14:07,609 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-16 00:21:25,114 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-16 09:28:03,889 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-16 10:23:09,074 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-16 11:03:02,358 WARNING Alert triggered for DL 1C Q 5692: 
+2026-07-16 11:03:46,418 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716053345.xlsx
+2026-07-16 11:03:50,718 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716053350.pdf
+2026-07-16 11:03:52,433 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716053352.csv
+2026-07-16 11:03:54,506 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716053354.xlsx
+2026-07-16 11:03:55,259 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716053355.xlsx
+2026-07-16 11:03:55,675 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716053355.xlsx
+2026-07-16 11:03:56,114 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716053356.xlsx
+2026-07-16 18:05:01,921 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-16 18:05:33,687 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-16 18:57:04,015 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716132704.csv
+2026-07-16 18:57:05,164 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716132704.xlsx
+2026-07-16 18:57:06,197 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716132706.pdf
+2026-07-16 18:57:06,908 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260716132706.xlsx
+2026-07-17 14:40:57,685 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-17 15:38:45,067 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-18 11:54:56,805 INFO authenticate_user: username='admin' found, verify_password=False
+2026-07-18 11:54:56,806 INFO authenticate_user: credentials rejected for username='admin'
+2026-07-18 11:55:05,520 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-21 21:51:49,237 INFO authenticate_user: username='admin' found, verify_password=True
+2026-07-22 15:41:39,806 INFO authenticate_user: username='admin' found, verify_password=False
+2026-07-22 15:41:39,808 INFO authenticate_user: credentials rejected for username='admin'
+2026-07-22 15:41:51,208 INFO authenticate_user: username='admin' found, verify_password=False
+2026-07-22 15:41:51,208 INFO authenticate_user: credentials rejected for username='admin'
+2026-07-22 15:41:58,329 INFO authenticate_user: username='admin' found, verify_password=True

@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Search Detections</h2>
+<form class="row g-3 mb-4" method="get">
+  <div class="col-md-3"><input class="form-control" name="plate" placeholder="Plate Number"></div>
+  <div class="col-md-3"><input class="form-control" name="date" placeholder="Date (YYYY-MM-DD)"></div>
+  <div class="col-md-3"><input class="form-control" name="vehicle_type" placeholder="Vehicle Type"></div>
+  <div class="col-md-3"><button class="btn btn-primary" type="submit">Search</button></div>
+</form>
+<div class="mb-3">
+  <form id="rtoToggleForm" class="d-inline">
+    <input type="hidden" name="enabled" id="autoRtoEnabled" value="{{ session.get('auto_rto')|default(False) and '1' or '0' }}">
+    <button id="toggleRtoBtn" type="button" class="btn btn-sm btn-outline-light">{{ 'Disable' if session.get('auto_rto') else 'Enable' }} RTO Auto-Lookup</button>
+  </form>
+  <button id="lookupNowBtn" class="btn btn-sm btn-primary ms-2">Lookup RTO Now</button>
+  <span id="rtoStatus" class="ms-3 text-muted"></span>
+</div>
+<div class="card bg-secondary">
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-7">
+        <table class="table table-dark table-striped">
+          <thead><tr><th>Plate</th><th>Vehicle</th><th>Date</th><th>Camera</th></tr></thead>
+          <tbody>
+            {% for item in results %}
+            <tr><td>{{ item.plate_number }}</td><td>{{ item.vehicle_type }}</td><td>{{ item.detection_date }}</td><td>{{ item.camera_name }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="col-md-5">
+        {% if vehicle_record %}
+        <h5>Vehicle Record</h5>
+        <p><strong>Plate:</strong> {{ vehicle_record.plate_number }}</p>
+        <p><strong>Owner:</strong> {{ vehicle_record.owner_name }}</p>
+        <p><strong>Type:</strong> {{ vehicle_record.vehicle_type }}</p>
+        <p><strong>Manufacturer:</strong> {{ vehicle_record.manufacturer }}</p>
+        <p><strong>Model:</strong> {{ vehicle_record.model }}</p>
+        <p><strong>Registration State:</strong> {{ vehicle_record.registration_state }}</p>
+        <p><strong>PUC Status:</strong> {{ vehicle_record.puc_status }}</p>
+        <p><strong>FASTag Balance:</strong> ₹{{ vehicle_record.fastag_balance }}</p>
+        <p><strong>FASTag Status:</strong> {{ vehicle_record.fastag_status }}</p>
+        {% if fastag_account %}
+        <hr>
+        <h6>FASTag Account</h6>
+        <p><strong>Balance:</strong> ₹{{ fastag_account.balance }}</p>
+        <p><strong>Status:</strong> {{ fastag_account.status }}</p>
+        {% endif %}
+        {% else %}
+        <div class="text-muted">Enter a plate number and click Search to view vehicle details. Use "Lookup RTO Now" to fetch records asynchronously.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.getElementById('toggleRtoBtn').addEventListener('click', async () => {
+  const enabled = document.getElementById('autoRtoEnabled').value === '1' ? '0' : '1';
+  const form = new FormData(); form.append('enabled', enabled);
+  const res = await fetch('/api/rto-toggle', {method:'POST', body: form});
+  const json = await res.json();
+  document.getElementById('autoRtoEnabled').value = json.enabled ? '1' : '0';
+  document.getElementById('toggleRtoBtn').textContent = json.enabled ? 'Disable RTO Auto-Lookup' : 'Enable RTO Auto-Lookup';
+});
+
+document.getElementById('lookupNowBtn').addEventListener('click', async () => {
+  const plate = document.querySelector('input[name="plate"]').value;
+  if (!plate) { alert('Enter a plate first'); return; }
+  document.getElementById('rtoStatus').textContent = 'Queued...';
+  const form = new FormData(); form.append('plate', plate);
+  const res = await fetch('/api/rto-enqueue', {method:'POST', body: form});
+  const data = await res.json();
+  if (data.job_id) {
+    const jobId = data.job_id;
+    const poll = setInterval(async () => {
+      const sres = await fetch('/api/rto-job/' + jobId);
+      if (!sres.ok) { clearInterval(poll); document.getElementById('rtoStatus').textContent = 'Error'; return; }
+      const status = await sres.json();
+      document.getElementById('rtoStatus').textContent = status.status;
+      if (status.status === 'completed' || status.status === 'not_found' || status.status === 'error') {
+        clearInterval(poll);
+        // reload page to pick up any new vehicle details
+        setTimeout(() => location.reload(), 800);
+      }
+    }, 1000);
+  } else {
+    document.getElementById('rtoStatus').textContent = 'Failed to enqueue';
+  }
+});
+</script>
+{% endblock %}

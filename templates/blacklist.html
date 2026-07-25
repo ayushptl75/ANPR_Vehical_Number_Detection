@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Blacklist Management</h2>
+<form class="row g-3 mb-4" method="post">
+  <div class="col-md-4"><input class="form-control" name="plate_number" placeholder="Plate Number"></div>
+  <div class="col-md-4"><input class="form-control" name="reason" placeholder="Reason"></div>
+  <div class="col-md-4"><button class="btn btn-danger" type="submit">Add to Blacklist</button></div>
+</form>
+<div class="card bg-secondary">
+  <div class="card-body">
+    <table class="table table-dark table-striped">
+      <thead><tr><th>Plate</th><th>Reason</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for entry in entries %}
+        <tr><td>{{ entry.plate_number }}</td><td>{{ entry.reason }}</td><td><a class="btn btn-sm btn-outline-light" href="{{ url_for('delete_blacklist', blacklist_id=entry.id) }}">Delete</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
