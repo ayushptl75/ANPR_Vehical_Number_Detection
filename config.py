@@ -32,7 +32,7 @@ class Config:
     LLM_OCR_TIMEOUT = float(os.getenv("LLM_TIMEOUT", "20"))
     MAX_DUPLICATE_SECONDS = int(os.getenv("MAX_DUPLICATE_SECONDS", "15"))
     VEHICLE_MODEL_PATH = os.getenv("VEHICLE_MODEL_PATH", "yolov8n.pt")
-    PLATE_MODEL_PATH = os.getenv("PLATE_MODEL_PATH", "yolov8n.pt")
+    PLATE_MODEL_PATH = os.getenv("PLATE_MODEL_PATH", str(BASE_DIR / "models" / "license_plate_detector.pt"))
     PLATE_CROP_PADDING = int(os.getenv("PLATE_CROP_PADDING", "5"))
     PLATE_CONFIDENCE_THRESHOLD = float(os.getenv("PLATE_CONFIDENCE_THRESHOLD", "0.35"))
     DEBUG_MODE = os.getenv("DEBUG_MODE", "False").lower() in ("1", "true", "yes")

@@ -34,3 +34,10 @@
 2026-07-22 15:41:51,208 INFO authenticate_user: username='admin' found, verify_password=False
 2026-07-22 15:41:51,208 INFO authenticate_user: credentials rejected for username='admin'
 2026-07-22 15:41:58,329 INFO authenticate_user: username='admin' found, verify_password=True
+2026-08-16 10:21:46,192 INFO authenticate_user: username='admin' found, verify_password=False
+2026-08-16 10:21:46,193 INFO authenticate_user: credentials rejected for username='admin'
+2026-08-16 10:21:53,264 INFO authenticate_user: username='admin' found, verify_password=True
+2026-08-16 11:00:31,717 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:00:31,718 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:00:31,719 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:00:31,720 INFO [PlateDetector] No plate model path configured. Using fallback detection.

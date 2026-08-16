@@ -34,6 +34,30 @@ class PlateDetectorTests(unittest.TestCase):
 
             self.assertEqual(resolved, str(model_file))
 
+    def test_missing_model_file_triggers_fallback_status(self) -> None:
+        detector = PlateDetector(model_path="non_existent_model_weights.pt")
+        self.assertFalse(detector.is_dedicated)
+        self.assertIn(detector.model_status, {"file_not_found", "no_path"})
+
+    def test_is_valid_bbox_filters_invalid_geometries(self) -> None:
+        detector = PlateDetector(model_path="")
+        shape = (480, 640, 3)
+
+        # Valid plate candidate (e.g. 150x40 px -> ratio 3.75)
+        self.assertTrue(detector._is_valid_bbox([100, 100, 250, 140], shape, conf=0.85))
+
+        # Invalid: full frame background crop
+        self.assertFalse(detector._is_valid_bbox([0, 0, 638, 478], shape, conf=0.95))
+
+        # Invalid: undersized width
+        self.assertFalse(detector._is_valid_bbox([100, 100, 140, 120], shape, conf=0.85))
+
+        # Invalid: square aspect ratio (e.g. 100x100 -> ratio 1.0)
+        self.assertFalse(detector._is_valid_bbox([100, 100, 200, 200], shape, conf=0.85))
+
+        # Invalid: out of frame bounds
+        self.assertFalse(detector._is_valid_bbox([-10, 100, 250, 140], shape, conf=0.85))
+
 
 if __name__ == "__main__":
     unittest.main()
