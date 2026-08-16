@@ -41,3 +41,468 @@
 2026-08-16 11:00:31,718 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
 2026-08-16 11:00:31,719 INFO [PlateDetector] No plate model path configured. Using fallback detection.
 2026-08-16 11:00:31,720 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:07:28,764 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:07:28,766 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:07:28,766 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:07:28,768 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:07:59,865 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:07:59,866 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:07:59,866 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:07:59,868 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:14:43,051 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:14:43,052 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:14:43,052 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:14:43,055 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:15:31,901 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:15:31,902 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:15:31,903 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:15:31,906 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:16:03,689 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:16:03,689 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:16:03,690 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:16:03,691 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:17:59,523 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:18:28,084 INFO authenticate_user: username='admin' found, verify_password=True
+2026-08-16 11:22:19,494 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:22:19,495 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:22:19,495 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:22:19,497 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:22:41,434 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:22:41,435 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:22:41,435 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:22:41,437 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:23:02,593 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:23:02,593 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:23:02,594 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:23:02,595 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:25:50,241 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:25:50,242 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:25:50,243 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:25:50,244 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:30:54,976 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:30:54,976 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 11:30:54,977 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 11:30:54,978 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:10:43,616 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:10:43,617 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:10:43,618 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:10:43,619 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:12:49,238 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:12:49,338 INFO Camera capture stopped: MockCam
+2026-08-16 12:12:49,339 INFO Camera capture stopped: MockCam
+2026-08-16 12:12:54,241 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:12:54,242 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:12:54,243 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:12:54,246 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:14:45,378 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:14:45,470 INFO Camera capture stopped: MockCam
+2026-08-16 12:14:45,471 INFO Camera capture stopped: MockCam
+2026-08-16 12:14:50,784 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:14:50,785 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:14:50,785 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:14:50,787 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:16:05,934 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:16:06,031 INFO Camera capture stopped: MockCam
+2026-08-16 12:16:06,032 INFO Camera capture stopped: MockCam
+2026-08-16 12:16:10,961 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:16:10,961 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:16:10,961 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:16:10,963 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:20:02,174 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:20:02,275 INFO Camera capture stopped: MockCam
+2026-08-16 12:20:02,276 INFO Camera capture stopped: MockCam
+2026-08-16 12:20:07,286 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:20:07,287 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:20:07,288 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:20:07,289 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:21:47,143 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:22:16,533 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:23:12,543 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:23:12,639 INFO Camera capture stopped: MockCam
+2026-08-16 12:23:12,641 INFO Camera capture stopped: MockCam
+2026-08-16 12:23:13,205 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:23:56,118 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:23:56,119 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:23:56,119 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:23:56,121 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:27:45,032 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:27:49,011 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:27:49,113 INFO Camera capture stopped: MockCam
+2026-08-16 12:27:49,113 INFO Camera capture stopped: MockCam
+2026-08-16 12:27:49,802 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:28:32,847 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:28:32,848 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:28:32,848 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:28:32,850 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:28:59,950 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:29:03,765 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:29:03,865 INFO Camera capture stopped: MockCam
+2026-08-16 12:29:03,866 INFO Camera capture stopped: MockCam
+2026-08-16 12:29:04,771 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:29:47,900 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:29:47,901 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:29:47,902 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:29:47,903 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:38:10,467 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:38:57,683 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:39:01,656 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:39:01,755 INFO Camera capture stopped: MockCam
+2026-08-16 12:39:01,756 INFO Camera capture stopped: MockCam
+2026-08-16 12:39:02,409 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:39:43,493 INFO Camera connected: Webcam (FPS: -1.0)
+2026-08-16 12:39:43,818 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:39:43,913 INFO Camera capture stopped: TestCam
+2026-08-16 12:39:43,914 INFO Camera capture stopped: TestCam
+2026-08-16 12:39:44,730 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:39:44,862 WARNING Corrupted/empty frame from Webcam. Reconnecting...
+2026-08-16 12:39:48,232 INFO Camera connected: Webcam (FPS: -1.0)
+2026-08-16 12:39:48,864 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816070948.csv
+2026-08-16 12:39:49,292 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816070948.xlsx
+2026-08-16 12:39:49,312 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816070949.pdf
+2026-08-16 12:39:51,786 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:39:51,789 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:39:51,792 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:39:51,795 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:41:16,680 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:41:19,631 INFO Camera connected: Webcam (FPS: -1.0)
+2026-08-16 12:41:20,012 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:41:20,101 INFO Camera capture stopped: TestCam
+2026-08-16 12:41:20,102 INFO Camera capture stopped: TestCam
+2026-08-16 12:41:20,965 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:41:21,057 WARNING Corrupted/empty frame from Webcam. Reconnecting...
+2026-08-16 12:41:24,402 INFO Camera connected: Webcam (FPS: -1.0)
+2026-08-16 12:41:24,425 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071124.csv
+2026-08-16 12:41:24,715 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071124.xlsx
+2026-08-16 12:41:24,738 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071124.pdf
+2026-08-16 12:42:30,195 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:42:33,996 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:42:34,100 INFO Camera capture stopped: MockCam
+2026-08-16 12:42:34,101 INFO Camera capture stopped: MockCam
+2026-08-16 12:42:34,758 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:43:15,829 INFO Camera connected: Webcam (FPS: -1.0)
+2026-08-16 12:43:16,254 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:43:16,343 INFO Camera capture stopped: TestCam
+2026-08-16 12:43:16,344 INFO Camera capture stopped: TestCam
+2026-08-16 12:43:17,189 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:43:17,301 WARNING Corrupted/empty frame from Webcam. Reconnecting...
+2026-08-16 12:43:20,636 INFO Camera connected: Webcam (FPS: -1.0)
+2026-08-16 12:43:21,461 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071321.csv
+2026-08-16 12:43:21,757 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071321.xlsx
+2026-08-16 12:43:21,775 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071321.pdf
+2026-08-16 12:43:24,410 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:43:24,413 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:43:24,415 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:43:24,421 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:43:45,871 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:43:49,113 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:43:49,212 INFO Camera capture stopped: TestCam
+2026-08-16 12:43:49,213 INFO Camera capture stopped: TestCam
+2026-08-16 12:43:49,813 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:43:53,551 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071353.csv
+2026-08-16 12:43:53,812 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071353.xlsx
+2026-08-16 12:43:53,838 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071353.pdf
+2026-08-16 12:45:58,836 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:46:01,934 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:46:02,031 INFO Camera capture stopped: TestCam
+2026-08-16 12:46:02,033 INFO Camera capture stopped: TestCam
+2026-08-16 12:46:02,577 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:46:06,218 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071606.csv
+2026-08-16 12:46:06,499 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071606.xlsx
+2026-08-16 12:46:06,517 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071606.pdf
+2026-08-16 12:46:39,473 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:46:42,963 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:46:43,062 INFO Camera capture stopped: TestCam
+2026-08-16 12:46:43,063 INFO Camera capture stopped: TestCam
+2026-08-16 12:46:43,602 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:46:47,910 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071647.csv
+2026-08-16 12:46:48,197 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071647.xlsx
+2026-08-16 12:46:48,212 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071648.pdf
+2026-08-16 12:47:17,902 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:47:21,149 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:47:21,240 INFO Camera capture stopped: TestCam
+2026-08-16 12:47:21,241 INFO Camera capture stopped: TestCam
+2026-08-16 12:47:21,782 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:47:25,907 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071725.csv
+2026-08-16 12:47:26,167 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071725.xlsx
+2026-08-16 12:47:26,186 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071726.pdf
+2026-08-16 12:47:56,197 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:47:59,547 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:47:59,647 INFO Camera capture stopped: TestCam
+2026-08-16 12:47:59,649 INFO Camera capture stopped: TestCam
+2026-08-16 12:48:00,198 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:48:04,136 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071804.csv
+2026-08-16 12:48:04,415 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071804.xlsx
+2026-08-16 12:48:04,433 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071804.pdf
+2026-08-16 12:48:33,643 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:48:36,833 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:48:36,930 INFO Camera capture stopped: TestCam
+2026-08-16 12:48:36,931 INFO Camera capture stopped: TestCam
+2026-08-16 12:48:37,498 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:48:41,481 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071841.csv
+2026-08-16 12:48:41,764 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071841.xlsx
+2026-08-16 12:48:41,780 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071841.pdf
+2026-08-16 12:48:52,336 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:48:56,398 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:48:56,497 INFO Camera capture stopped: MockCam
+2026-08-16 12:48:56,498 INFO Camera capture stopped: MockCam
+2026-08-16 12:48:57,188 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:49:02,589 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:49:02,684 INFO Camera capture stopped: TestCam
+2026-08-16 12:49:02,685 INFO Camera capture stopped: TestCam
+2026-08-16 12:49:03,300 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:49:07,018 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071907.csv
+2026-08-16 12:49:07,301 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071907.xlsx
+2026-08-16 12:49:07,318 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071907.pdf
+2026-08-16 12:49:09,848 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:49:09,851 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:49:09,853 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:49:09,857 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:49:19,689 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:49:23,363 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 12:49:23,461 INFO Camera capture stopped: MockCam
+2026-08-16 12:49:23,462 INFO Camera capture stopped: MockCam
+2026-08-16 12:49:24,418 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:49:29,990 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 12:49:30,085 INFO Camera capture stopped: TestCam
+2026-08-16 12:49:30,086 INFO Camera capture stopped: TestCam
+2026-08-16 12:49:30,733 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:49:34,380 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071934.csv
+2026-08-16 12:49:34,629 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071934.xlsx
+2026-08-16 12:49:34,646 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816071934.pdf
+2026-08-16 12:49:37,026 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:49:37,026 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 12:49:37,026 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 12:49:37,028 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 22:02:21,241 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:19:38,620 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:19:42,219 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 22:19:42,316 INFO Camera capture stopped: TestCam
+2026-08-16 22:19:42,316 INFO Camera capture stopped: TestCam
+2026-08-16 22:19:42,809 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:19:46,824 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816164946.csv
+2026-08-16 22:19:47,190 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816164946.xlsx
+2026-08-16 22:19:47,207 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816164947.pdf
+2026-08-16 22:21:24,341 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:23:57,103 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:24:00,688 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 22:24:00,791 INFO Camera capture stopped: TestCam
+2026-08-16 22:24:00,793 INFO Camera capture stopped: TestCam
+2026-08-16 22:24:01,315 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:24:05,531 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816165405.csv
+2026-08-16 22:24:05,863 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816165405.xlsx
+2026-08-16 22:24:05,883 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816165405.pdf
+2026-08-16 22:29:12,538 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:29:16,676 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 22:29:16,824 INFO Camera capture stopped: MockCam
+2026-08-16 22:29:16,825 INFO Camera capture stopped: MockCam
+2026-08-16 22:29:17,399 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:29:23,026 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 22:29:23,124 INFO Camera capture stopped: TestCam
+2026-08-16 22:29:23,126 INFO Camera capture stopped: TestCam
+2026-08-16 22:29:23,738 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:29:27,756 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816165927.csv
+2026-08-16 22:29:28,063 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816165927.xlsx
+2026-08-16 22:29:28,087 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816165928.pdf
+2026-08-16 22:29:30,729 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 22:29:30,731 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:29:30,734 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 22:29:30,737 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 22:31:35,101 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 22:34:12,133 ERROR RTO lookup failed for DL1CG5692: HTTPSConnectionPool(host='your-rto-provider.example', port=443): Max retries exceeded with url: /api?plate=DL1CG5692&provider=your-provider-name (Caused by NameResolutionError("HTTPSConnection(host='your-rto-provider.example', port=443): Failed to resolve 'your-rto-provider.example' ([Errno 11001] getaddrinfo failed)"))
+Traceback (most recent call last):
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+        (self._dns_host, self.port),
+    ...<2 lines>...
+        socket_options=self.socket_options,
+    )
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python314\Lib\socket.py", line 983, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\urllib3\connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+        conn,
+    ...<10 lines>...
+        **response_kw,
+    )
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\urllib3\connectionpool.py", line 1106, in _validate_conn
+    conn.connect()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ~~~~~~~~~~~~~~^^
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='your-rto-provider.example', port=443): Failed to resolve 'your-rto-provider.example' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\requests\adapters.py", line 696, in send
+    resp = conn.urlopen(
+        method=request.method,
+    ...<9 lines>...
+        chunked=chunked,
+    )
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\urllib3\connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+        method, url, error=new_e, _pool=self, _stacktrace=sys.exc_info()[2]
+    )
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\urllib3\util\retry.py", line 543, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='your-rto-provider.example', port=443): Max retries exceeded with url: /api?plate=DL1CG5692&provider=your-provider-name (Caused by NameResolutionError("HTTPSConnection(host='your-rto-provider.example', port=443): Failed to resolve 'your-rto-provider.example' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Hp\Desktop\ANPR_project\services\rto_vehicle_service.py", line 56, in get_vehicle_details
+    response = requests.get(self.api_url, headers=headers, params=params, timeout=self.timeout)
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\requests\api.py", line 87, in get
+    return request("get", url, params=params, **kwargs)
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\requests\api.py", line 71, in request
+    return session.request(method=method, url=url, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\requests\sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\requests\sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+  File "C:\Users\Hp\AppData\Roaming\Python\Python314\site-packages\requests\adapters.py", line 729, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='your-rto-provider.example', port=443): Max retries exceeded with url: /api?plate=DL1CG5692&provider=your-provider-name (Caused by NameResolutionError("HTTPSConnection(host='your-rto-provider.example', port=443): Failed to resolve 'your-rto-provider.example' ([Errno 11001] getaddrinfo failed)"))
+2026-08-16 23:46:07,758 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 23:46:12,258 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 23:46:12,400 INFO Camera capture stopped: MockCam
+2026-08-16 23:46:12,401 INFO Camera capture stopped: MockCam
+2026-08-16 23:46:13,073 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 23:46:18,005 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 23:46:18,102 INFO Camera capture stopped: TestCam
+2026-08-16 23:46:18,103 INFO Camera capture stopped: TestCam
+2026-08-16 23:46:18,754 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 23:46:22,052 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816181622.csv
+2026-08-16 23:46:22,413 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816181622.xlsx
+2026-08-16 23:46:22,429 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816181622.pdf
+2026-08-16 23:46:24,705 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 23:46:24,708 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 23:46:24,709 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 23:46:24,713 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 23:48:18,984 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-16 23:48:18,984 INFO [API] Returning cached vehicle information for GJ05AB1234
+2026-08-16 23:48:18,986 INFO [API] Vehicle lookup started for DL01XX9999
+2026-08-16 23:48:18,986 WARNING [API] Vehicle lookup failed with status code 404 for DL01XX9999
+2026-08-16 23:48:18,987 INFO [API] Vehicle lookup started for MH12CD5678
+2026-08-16 23:48:18,987 INFO [API] Vehicle lookup successful for MH12CD5678
+2026-08-16 23:48:18,988 INFO [API] Test mode active for XYZ99. Generating mock CarInfo response.
+2026-08-16 23:48:19,072 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-16 23:48:19,073 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-16 23:48:34,800 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-16 23:48:34,801 INFO [API] Returning cached vehicle information for GJ05AB1234
+2026-08-16 23:48:34,802 INFO [API] Vehicle lookup started for DL01XX9999
+2026-08-16 23:48:34,802 WARNING [API] Vehicle lookup failed with status code 404 for DL01XX9999
+2026-08-16 23:48:34,803 INFO [API] Vehicle lookup started for MH12CD5678
+2026-08-16 23:48:34,804 INFO [API] Vehicle lookup successful for MH12CD5678
+2026-08-16 23:48:34,805 WARNING [ANPR] Low confidence for GJ05AB1234 (0.10). Skipping API call.
+2026-08-16 23:48:34,806 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-16 23:48:34,807 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-16 23:51:09,730 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 23:51:13,557 INFO [API] Test mode active for NOTDETECTED. Generating mock CarInfo response.
+2026-08-16 23:51:13,684 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:13,934 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:14,055 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:14,189 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:14,320 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:14,449 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:14,572 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:14,716 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:14,840 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:14,969 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:15,122 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:39,369 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 23:51:44,900 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-16 23:51:44,997 INFO Camera capture stopped: MockCam
+2026-08-16 23:51:44,998 INFO Camera capture stopped: MockCam
+2026-08-16 23:51:45,503 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-16 23:51:45,503 INFO [API] Returning cached vehicle information for GJ05AB1234
+2026-08-16 23:51:45,506 INFO [API] Vehicle lookup started for DL01XX9999
+2026-08-16 23:51:45,506 WARNING [API] Vehicle lookup failed with status code 404 for DL01XX9999
+2026-08-16 23:51:45,509 INFO [API] Vehicle lookup started for MH12CD5678
+2026-08-16 23:51:45,509 INFO [API] Vehicle lookup successful for MH12CD5678
+2026-08-16 23:51:45,511 WARNING [ANPR] Low confidence for GJ05AB1234 (0.10). Skipping API call.
+2026-08-16 23:51:45,514 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-16 23:51:45,516 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-16 23:51:45,643 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 23:51:49,143 INFO [API] Test mode active for NOTDETECTED. Generating mock CarInfo response.
+2026-08-16 23:51:49,155 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:49,169 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:49,176 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:49,183 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:49,189 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:49,197 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:49,203 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:49,210 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:49,217 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:49,224 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:49,232 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-16 23:51:54,227 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-16 23:51:54,320 INFO Camera capture stopped: TestCam
+2026-08-16 23:51:54,321 INFO Camera capture stopped: TestCam
+2026-08-16 23:51:54,863 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 23:51:59,129 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816182159.csv
+2026-08-16 23:51:59,473 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816182159.xlsx
+2026-08-16 23:51:59,494 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816182159.pdf
+2026-08-16 23:52:01,578 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 23:52:01,581 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 23:52:01,583 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 23:52:01,587 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-16 23:54:36,719 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-16 23:55:37,397 INFO [API] Test mode active for DL1CG5692. Generating mock CarInfo response.
+2026-08-17 00:08:48,984 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-17 00:08:52,473 INFO Camera connected: MockCam (FPS: -1.0)
+2026-08-17 00:08:52,571 INFO Camera capture stopped: MockCam
+2026-08-17 00:08:52,572 INFO Camera capture stopped: MockCam
+2026-08-17 00:08:53,159 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-17 00:08:53,159 INFO [API] Returning cached vehicle information for GJ05AB1234
+2026-08-17 00:08:53,161 INFO [API] Vehicle lookup started for DL01XX9999
+2026-08-17 00:08:53,161 WARNING [API] Vehicle lookup failed with status code 404 for DL01XX9999
+2026-08-17 00:08:53,162 INFO [API] Vehicle lookup started for MH12CD5678
+2026-08-17 00:08:53,163 INFO [API] Vehicle lookup successful for MH12CD5678
+2026-08-17 00:08:53,164 WARNING [ANPR] Low confidence for GJ05AB1234 (0.10). Skipping API call.
+2026-08-17 00:08:53,165 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-17 00:08:53,167 INFO [API] Test mode active for GJ05AB1234. Generating mock CarInfo response.
+2026-08-17 00:08:53,242 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-17 00:08:55,049 INFO [API] Test mode active for NOTDETECTED. Generating mock CarInfo response.
+2026-08-17 00:08:55,058 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:55,063 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:55,066 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:55,072 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:55,075 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:55,079 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:55,082 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:55,086 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:55,089 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:55,092 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:55,095 INFO [API] Returning cached vehicle information for NOTDETECTED
+2026-08-17 00:08:58,602 INFO Camera connected: TestCam (FPS: -1.0)
+2026-08-17 00:08:58,697 INFO Camera capture stopped: TestCam
+2026-08-17 00:08:58,698 INFO Camera capture stopped: TestCam
+2026-08-17 00:08:59,304 WARNING [PlateDetector] Dedicated plate model file NOT found at 'models/license_plate_detector.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-17 00:09:02,791 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816183902.csv
+2026-08-17 00:09:03,140 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816183902.xlsx
+2026-08-17 00:09:03,156 INFO Exported report C:\Users\Hp\Desktop\ANPR_project\reports\anpr_report_daily_20260816183903.pdf
+2026-08-17 00:09:05,510 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-17 00:09:05,513 WARNING [PlateDetector] Dedicated plate model file NOT found at 'non_existent_model_weights.pt'. Operating in OpenCV contour fallback mode. To use a dedicated detector, place your trained weights file (e.g. license_plate_detector.pt) in the 'models/' directory and update PLATE_MODEL_PATH in .env.
+2026-08-17 00:09:05,515 INFO [PlateDetector] No plate model path configured. Using fallback detection.
+2026-08-17 00:09:05,522 INFO [PlateDetector] No plate model path configured. Using fallback detection.

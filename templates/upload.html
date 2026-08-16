@@ -13,114 +13,95 @@
         {% if result %}
         <div class="mt-3 card bg-light text-dark">
           <div class="card-body">
-            <h5 class="card-title">ANPR Scan Result</h5>
-            <p><strong>Registration Number:</strong>
-              {% if result.plate_number %}
-                {{ result.plate_number }}
-              {% else %}
-                Not Detected
-              {% endif %}
-            </p>
-            <p><strong>Plate Detection Confidence:</strong> {{ (result.selected_plate_confidence * 100)|round(1) if result.selected_plate_confidence is not none else '0' }}%</p>
-            <p><strong>OCR Confidence:</strong> {{ (result.confidence * 100)|round(1) if result.confidence is not none else '0' }}%</p>
-            <p><strong>ANPR Status:</strong>
-              {% if result.plate_number %}
-                <span class="badge bg-success">Detected</span>
-              {% else %}
-                <span class="badge bg-danger">Failed</span>
-              {% endif %}
-            </p>
+            <h5 class="card-title text-primary"><i class="bi bi-camera"></i> ANPR Scan Results</h5>
+            
+            <!-- Section A: ANPR Detection Data -->
+            <div class="p-3 mb-3 bg-white rounded border border-primary">
+              <h6 class="text-primary fw-bold">🎥 ANPR Detection Data (Computer Vision)</h6>
+              <p class="mb-1"><strong>Plate Detected:</strong>
+                {% if result.plate_number %}
+                  <span class="badge bg-primary fs-6">{{ result.plate_number }}</span>
+                {% else %}
+                  <span class="badge bg-secondary">Not Detected</span>
+                {% endif %}
+              </p>
+              <p class="mb-1"><strong>Plate Crop Confidence:</strong> {{ ((result.selected_plate_confidence or 0) * 100)|round(1) }}%</p>
+              <p class="mb-1"><strong>OCR Confidence:</strong> {{ ((result.confidence or 0) * 100)|round(1) }}%</p>
+              <p class="mb-1"><strong>Vision Vehicle Type:</strong> {{ result.detected_vehicle_type or 'Unknown' }} ({{ ((result.detected_vehicle_confidence or 0) * 100)|round(1) }}% conf)</p>
 
-            <h6 class="mt-3">Image Detection</h6>
-            <p><strong>Detected Vehicle Type:</strong> {{ result.detected_vehicle_type or 'Unknown' }}</p>
-            <p><strong>Vehicle Detection Confidence:</strong> {{ (result.detected_vehicle_confidence * 100)|round(1) if result.detected_vehicle_confidence is not none else '0' }}%</p>
-
-            <h6 class="mt-3">RTO / Registration Information</h6>
-            {% if result.plate_valid and result.rto_status == 'success' %}
-            <p><strong>Registered Vehicle Class:</strong> {{ result.vehicle_details.registered_vehicle_class or 'Not Available' }}</p>
-            <p><strong>Manufacturer:</strong> {{ result.vehicle_details.manufacturer or 'Not Available' }}</p>
-            <p><strong>Model:</strong> {{ result.vehicle_details.model or 'Not Available' }}</p>
-            <p><strong>Fuel Type:</strong> {{ result.vehicle_details.fuel_type or 'Not Available' }}</p>
-            <p><strong>Color:</strong> {{ result.vehicle_details.vehicle_color or 'Not Available' }}</p>
-            <p><strong>Registration Date:</strong> {{ result.vehicle_details.registration_date or 'Not Available' }}</p>
-            <p><strong>Registration Expiry:</strong> {{ result.vehicle_details.registration_expiry or 'Not Available' }}</p>
-            <p><strong>RC Status:</strong> {{ result.vehicle_details.rc_status or 'Not Available' }}</p>
-
-            <h6 class="mt-3">Insurance</h6>
-            <p><strong>Insurance Provider:</strong> {{ result.vehicle_details.insurance_provider or 'Not Available' }}</p>
-            <p><strong>Insurance Status:</strong> {{ result.vehicle_details.insurance_status or 'Not Available' }}</p>
-            <p><strong>Insurance Expiry:</strong> {{ result.vehicle_details.insurance_expiry or 'Not Available' }}</p>
-
-            <h6 class="mt-3">PUC</h6>
-            <p><strong>PUC Status:</strong> {{ result.vehicle_details.puc_status or 'Not Available' }}</p>
-            <p><strong>PUC Expiry:</strong> {{ result.vehicle_details.puc_expiry or 'Not Available' }}</p>
-
-            <h6 class="mt-3">Owner</h6>
-            <p><strong>Owner Name:</strong> {{ result.vehicle_details.owner_name or 'Not Available' }}</p>
-
-            <h6 class="mt-3">Data Source</h6>
-            <p>{{ result.vehicle_details.data_source or 'Authorized API / Cache' }}</p>
-            {% else %}
-            <p><strong>Vehicle Information:</strong> Not available from the authorized API.</p>
-            <p><strong>Reason:</strong>
-              {% if not result.plate_number %}
-                Number plate was not detected or OCR result was invalid.
-              {% elif not result.plate_valid %}
-                Invalid Indian registration number format.
-              {% else %}
-                {{ result.rto_error or 'No valid registration details returned.' }}
-              {% endif %}
-            </p>
-            {% endif %}
-
-            {% if result.rto_error and result.rto_status != 'success' %}
-            <div class="alert alert-warning mt-3" role="alert">
-              Vehicle lookup failed: {{ result.rto_error }}
             </div>
-            {% endif %}
 
-            <h6 class="mt-3">Security</h6>
-            <p><strong>Blacklist Status:</strong>
-              {% if result.vehicle_details and result.vehicle_details.get('blacklist_status') == 'Blacklisted' %}
-                <span class="badge bg-danger">Blacklisted</span>
-              {% elif result.vehicle_details and result.vehicle_details.get('blacklist_status') %}
-                <span class="badge bg-success">{{ result.vehicle_details.get('blacklist_status') }}</span>
+            <!-- Section B: CarInfo Verified Vehicle Registration Data -->
+            <div class="p-3 bg-white rounded border border-secondary">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="text-dark fw-bold mb-0">📋 CarInfo Verified Vehicle Specifications</h6>
+                {% if result.verification_status == 'VERIFIED' or (result.carinfo and result.carinfo.verified) %}
+                  <span class="badge bg-success fs-6"><i class="bi bi-patch-check-fill"></i> VERIFIED</span>
+                {% elif result.verification_status == 'LOW CONFIDENCE' %}
+                  <span class="badge bg-warning text-dark fs-6"><i class="bi bi-exclamation-triangle-fill"></i> LOW CONFIDENCE</span>
+                {% elif result.verification_status == 'API ERROR' %}
+                  <span class="badge bg-danger fs-6"><i class="bi bi-exclamation-octagon-fill"></i> API ERROR</span>
+                {% else %}
+                  <span class="badge bg-secondary fs-6"><i class="bi bi-camera"></i> DETECTED</span>
+                {% endif %}
+              </div>
+
+              {% if result.carinfo or result.vehicle_details %}
+                {% set v = result.carinfo or result.vehicle_details %}
+                <p class="mb-1"><strong>Data Source:</strong> <span class="badge bg-info text-dark">{{ v.api_source or v.source_label or 'CarInfo API' }}</span></p>
+                <p class="mb-1"><strong>Registration Number:</strong> <span class="fw-bold text-primary">{{ v.registration_number or v.plate_number or result.plate_number }}</span></p>
+                <p class="mb-1"><strong>Vehicle Class:</strong> {{ v.vehicle_class or v.vehicle_type or 'Not Available' }}</p>
+                <p class="mb-1"><strong>Manufacturer:</strong> {{ v.manufacturer or 'Not Available' }}</p>
+                <p class="mb-1"><strong>Model:</strong> {{ v.model or 'Not Available' }}</p>
+                <p class="mb-1"><strong>Fuel Type:</strong> {{ v.fuel_type or 'Not Available' }}</p>
+                <p class="mb-1"><strong>Registration Date:</strong> {{ v.registration_date or 'Not Available' }}</p>
+                <p class="mb-1"><strong>Insurance Status:</strong> {{ v.insurance_status or 'Not Available' }} {% if v.insurance_expiry %}(Valid upto {{ v.insurance_expiry }}){% endif %}</p>
+                <p class="mb-1"><strong>Fitness Status:</strong> {{ v.fitness_status or 'Not Available' }}</p>
+                <p class="mb-1"><strong>PUCC Status:</strong> {{ v.pucc_status or v.puc_status or 'Not Available' }}</p>
+                {% if v.owner_information or v.owner_name %}
+                  <p class="mb-1"><strong>Owner Information:</strong> {{ v.owner_information or v.owner_name }}</p>
+                {% endif %}
               {% else %}
-                <span class="badge bg-secondary">Not Available</span>
+                <div class="alert alert-warning mb-0 py-2" role="alert">
+                  <i class="bi bi-exclamation-triangle-fill"></i> <strong>Vehicle information temporarily unavailable</strong><br>
+                  <small class="text-muted">Vehicle detected successfully. CarInfo registration lookup was not returned.</small>
+                </div>
               {% endif %}
-            </p>
+            </div>
 
+
+            <!-- Image Previews -->
             <div class="row mt-3">
               <div class="col-md-3">
-                <p class="mb-1"><strong>Original Image</strong></p>
+                <p class="mb-1 small font-monospace"><strong>Original Frame</strong></p>
                 {% if result.original_image_url %}
                   <img src="{{ result.original_image_url }}" class="img-fluid img-thumbnail" alt="Original image">
                 {% else %}
-                  <div class="text-muted">No image</div>
+                  <div class="text-muted small">No image</div>
                 {% endif %}
               </div>
               <div class="col-md-3">
-                <p class="mb-1"><strong>Processed Image</strong></p>
+                <p class="mb-1 small font-monospace"><strong>Processed Image</strong></p>
                 {% if result.processed_image_url %}
                   <img src="{{ result.processed_image_url }}" class="img-fluid img-thumbnail" alt="Processed image">
                 {% else %}
-                  <div class="text-muted">No processed image</div>
+                  <div class="text-muted small">No processed image</div>
                 {% endif %}
               </div>
               <div class="col-md-3">
-                <p class="mb-1"><strong>Detected Vehicle</strong></p>
+                <p class="mb-1 small font-monospace"><strong>Detected Vehicle</strong></p>
                 {% if result.vehicle_image_url %}
                   <img src="{{ result.vehicle_image_url }}" class="img-fluid img-thumbnail" alt="Vehicle crop">
                 {% else %}
-                  <div class="text-muted">No vehicle crop</div>
+                  <div class="text-muted small">No vehicle crop</div>
                 {% endif %}
               </div>
               <div class="col-md-3">
-                <p class="mb-1"><strong>Cropped Plate</strong></p>
+                <p class="mb-1 small font-monospace"><strong>Cropped Plate</strong></p>
                 {% if result.plate_image_url %}
                   <img src="{{ result.plate_image_url }}" class="img-fluid img-thumbnail" alt="Plate crop">
                 {% else %}
-                  <div class="text-muted">No plate crop</div>
+                  <div class="text-muted small">No plate crop</div>
                 {% endif %}
               </div>
             </div>
@@ -143,23 +124,26 @@
             <p>Processed video: <a href="{{ video_output }}" target="_blank">{{ video_output }}</a></p>
             {% if video_detections %}
             <h6 class="mt-3">Detections</h6>
-            <ul class="list-group">
+            <ul class="list-group text-dark">
             {% for d in video_detections %}
             <li class="list-group-item">
-              <div><strong>Plate:</strong> {{ d.plate }} <span class="text-muted">(frame {{ d.frame }})</span></div>
-              <div><strong>Confidence:</strong> {{ d.confidence }}%</div>
-              <div><strong>Vehicle:</strong> {{ d.vehicle_type }}</div>
-              <div><strong>Toll:</strong> ₹{{ d.toll_amount }} • <strong>FASTag:</strong> {% if d.fastag %}₹{{ d.fastag.balance }} ({{ d.fastag.status }}){% else %}No FASTag{% endif %}</div>
-              <div><strong>Owner:</strong> {{ d.owner_name }}</div>
-              <div><strong>PUC Status:</strong> {{ d.puc_status }}</div>
-              <div><strong>FASTag:</strong> {% if d.fastag %}₹{{ d.fastag.balance }} ({{ d.fastag.status }}){% else %}No FASTag{% endif %}</div>
-              {% if d.vehicle_details %}
-              <div><strong>Manufacturer:</strong> {{ d.vehicle_details.manufacturer or 'Unknown' }}</div>
-              <div><strong>Model:</strong> {{ d.vehicle_details.model or d.vehicle_details.variant or 'Unknown' }}</div>
-              {% endif %}
+              <div><strong>Plate Detected:</strong> <span class="badge bg-primary">{{ d.plate }}</span> <span class="text-muted">(frame {{ d.frame }})</span></div>
+              <div><strong>OCR Confidence:</strong> {{ d.confidence }}%</div>
+              <div><strong>Vision Vehicle:</strong> {{ d.vehicle_type }}</div>
+              <hr class="my-1">
+              <div>
+                <strong>Verification:</strong>
+                {% if d.vehicle_details and d.vehicle_details.verified %}
+                  <span class="badge bg-success">VERIFIED</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">NOT VERIFIED</span>
+                {% endif %}
+              </div>
+              <div><strong>Owner:</strong> {{ d.owner_name or 'Unavailable / Not Verified' }}</div>
+              <div><strong>PUC Status:</strong> {{ d.puc_status or 'N/A' }}</div>
               <div class="mt-2">
-                {% if d.vehicle_image_url %}<a href="{{ d.vehicle_image_url }}" target="_blank">Vehicle image</a>{% endif %}
-                {% if d.plate_image_url %} • <a href="{{ d.plate_image_url }}" target="_blank">Plate image</a>{% endif %}
+                {% if d.vehicle_image_url %}<a href="{{ d.vehicle_image_url }}" target="_blank">Vehicle crop</a>{% endif %}
+                {% if d.plate_image_url %} • <a href="{{ d.plate_image_url }}" target="_blank">Plate crop</a>{% endif %}
               </div>
             </li>
             {% endfor %}

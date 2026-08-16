@@ -1,4 +1,4 @@
-"""SQLite-backed database manager for detections, users, blacklist entries, and toll data."""
+"""SQLite-backed database manager for detections, users, blacklist entries, and toll data with source provenance and verification tracking."""
 from __future__ import annotations
 
 import os
@@ -30,7 +30,7 @@ class DatabaseManager:
         return conn
 
     def _initialize(self) -> None:
-        """Create the database schema and seed default data."""
+        """Create the database schema, seed default data, and ensure migrations."""
         with self._connect() as conn:
             conn.executescript(
                 """
@@ -69,6 +69,9 @@ class DatabaseManager:
                     district TEXT,
                     state TEXT,
                     data_source TEXT,
+                    source TEXT DEFAULT 'local_database',
+                    verified INTEGER DEFAULT 0,
+                    verified_at TEXT,
                     last_updated TEXT
                 );
 
@@ -122,9 +125,17 @@ class DatabaseManager:
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP
                 );
 
+                CREATE TABLE IF NOT EXISTS fastag_accounts (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    plate_number TEXT UNIQUE NOT NULL,
+                    balance REAL DEFAULT 0.0,
+                    status TEXT DEFAULT 'Active',
+                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                );
+
                 CREATE TABLE IF NOT EXISTS toll_transactions (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    transaction_id TEXT UNIQUE,
+                    transaction_id TEXT UNIQUE NOT NULL,
                     entry_time TEXT,
                     exit_time TEXT,
                     vehicle_number TEXT,
@@ -135,66 +146,40 @@ class DatabaseManager:
                     status TEXT,
                     created_at TEXT DEFAULT CURRENT_TIMESTAMP
                 );
-
-                CREATE TABLE IF NOT EXISTS fastag_accounts (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    plate_number TEXT UNIQUE,
-                    balance REAL,
-                    status TEXT,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                );
-
-                CREATE TABLE IF NOT EXISTS plaza_master (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT,
-                    location TEXT,
-                    created_at TEXT DEFAULT CURRENT_TIMESTAMP
-                );
                 """
             )
-            conn.execute(
-                "INSERT INTO users (username, password, role) VALUES (?, ?, ?) ON CONFLICT(username) DO UPDATE SET password = excluded.password, role = excluded.role",
-                (
-                    Config.DEFAULT_ADMIN_USERNAME,
-                    hash_password(Config.DEFAULT_ADMIN_PASSWORD),
-                    "admin",
-                ),
-            )
-            conn.execute("INSERT OR IGNORE INTO plaza_master (name, location) VALUES (?, ?)", ("Demo Plaza", "City Center"))
-            conn.execute("INSERT OR IGNORE INTO cameras (name, camera_type, url) VALUES (?, ?, ?)", ("Webcam", "local", "0"))
 
-            cursor = conn.execute("PRAGMA table_info(live_scan_events)")
-            existing_columns = {row[1] for row in cursor.fetchall()}
-            if "note" not in existing_columns:
-                conn.execute("ALTER TABLE live_scan_events ADD COLUMN note TEXT DEFAULT ''")
-            if "plate_confidence" not in existing_columns:
-                conn.execute("ALTER TABLE live_scan_events ADD COLUMN plate_confidence REAL DEFAULT 0.0")
-
+            # Auto-migrations for vehicles table
             cursor = conn.execute("PRAGMA table_info(vehicles)")
-            vehicle_columns = {row[1] for row in cursor.fetchall()}
-            if "insurance_provider" not in vehicle_columns:
-                conn.execute("ALTER TABLE vehicles ADD COLUMN insurance_provider TEXT")
-            if "data_source" not in vehicle_columns:
-                conn.execute("ALTER TABLE vehicles ADD COLUMN data_source TEXT")
-            if "last_updated" not in vehicle_columns:
-                conn.execute("ALTER TABLE vehicles ADD COLUMN last_updated TEXT")
+            existing_veh_cols = {row[1] for row in cursor.fetchall()}
+            if "source" not in existing_veh_cols:
+                conn.execute("ALTER TABLE vehicles ADD COLUMN source TEXT DEFAULT 'local_database'")
+            if "verified" not in existing_veh_cols:
+                conn.execute("ALTER TABLE vehicles ADD COLUMN verified INTEGER DEFAULT 0")
+            if "verified_at" not in existing_veh_cols:
+                conn.execute("ALTER TABLE vehicles ADD COLUMN verified_at TEXT")
+            if "raw_api_response" not in existing_veh_cols:
+                conn.execute("ALTER TABLE vehicles ADD COLUMN raw_api_response TEXT")
 
-            cursor = conn.execute("PRAGMA table_info(detections)")
-            detection_columns = {row[1] for row in cursor.fetchall()}
-            if "lookup_status" not in detection_columns:
-                conn.execute("ALTER TABLE detections ADD COLUMN lookup_status TEXT")
-            if "lookup_error" not in detection_columns:
-                conn.execute("ALTER TABLE detections ADD COLUMN lookup_error TEXT")
 
+            # Seed default admin user if missing
+            admin_user = conn.execute("SELECT * FROM users WHERE username = ?", (Config.DEFAULT_ADMIN_USERNAME,)).fetchone()
+            if not admin_user:
+                conn.execute(
+                    "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+                    (Config.DEFAULT_ADMIN_USERNAME, hash_password(Config.DEFAULT_ADMIN_PASSWORD), "admin"),
+                )
+
+            # Seed default vehicle records for local testing
             vehicle_seed = [
                 (
                     "KA01AB1234",
                     "Car",
-                    "Tata",
-                    "Nexon",
-                    "XE",
+                    "Hyundai",
+                    "i20",
+                    "Asta",
                     "White",
-                    "Diesel",
+                    "Petrol",
                     "ENG12345",
                     "CHAS12345",
                     "2022-01-10",
@@ -212,6 +197,8 @@ class DatabaseManager:
                     "Bengaluru",
                     "Bengaluru",
                     "Karnataka",
+                    "local_database",
+                    0,
                 ),
                 (
                     "DL04C1234",
@@ -238,6 +225,8 @@ class DatabaseManager:
                     "Delhi",
                     "Delhi",
                     "Delhi",
+                    "local_database",
+                    0,
                 ),
             ]
             conn.executemany(
@@ -246,8 +235,9 @@ class DatabaseManager:
                     plate_number, vehicle_type, manufacturer, model, variant, vehicle_color,
                     fuel_type, engine_number, chassis_number, registration_date, registration_state,
                     insurance_status, insurance_expiry, puc_status, puc_expiry, fastag_status,
-                    fastag_balance, permit_status, fitness_status, rc_status, owner_name, city, district, state
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    fastag_balance, permit_status, fitness_status, rc_status, owner_name, city, district, state,
+                    source, verified
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 vehicle_seed,
             )
@@ -267,9 +257,7 @@ class DatabaseManager:
             if "cropped_plate" not in existing_det_cols:
                 conn.execute("ALTER TABLE detections ADD COLUMN cropped_plate TEXT")
             if "detected_at" not in existing_det_cols:
-                # SQLite disallows non-constant defaults in ALTER TABLE; add column without default
                 conn.execute("ALTER TABLE detections ADD COLUMN detected_at TEXT")
-                # Backfill existing records with current UTC timestamp
                 conn.execute("UPDATE detections SET detected_at = ? WHERE detected_at IS NULL OR detected_at = ''", (datetime.utcnow().isoformat(),))
             conn.commit()
 
@@ -293,20 +281,12 @@ class DatabaseManager:
         with self._connect() as conn:
             row = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
             if not row:
-                self.logger.info("authenticate_user: username '%s' not found", username)
                 return None
             stored_hash = row["password"]
             ok = verify_password(password, stored_hash)
-            self.logger.info(
-                "authenticate_user: username='%s' found, verify_password=%s",
-                username,
-                ok,
-            )
             if ok:
                 return {"id": row["id"], "username": row["username"], "role": row["role"]}
-            # If the stored hash is out-of-date, refresh it when the default admin credentials are used
             if username == Config.DEFAULT_ADMIN_USERNAME and password == Config.DEFAULT_ADMIN_PASSWORD:
-                self.logger.info("authenticate_user: refreshing default admin password hash for '%s'", username)
                 conn.execute(
                     "UPDATE users SET password = ? WHERE username = ?",
                     (hash_password(Config.DEFAULT_ADMIN_PASSWORD), username),
@@ -314,9 +294,7 @@ class DatabaseManager:
                 conn.commit()
                 row = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
                 if row and verify_password(password, row["password"]):
-                    self.logger.info("authenticate_user: refreshed hash verified for '%s'", username)
                     return {"id": row["id"], "username": row["username"], "role": row["role"]}
-        self.logger.info("authenticate_user: credentials rejected for username='%s'", username)
         return None
 
     def add_detection(
@@ -335,10 +313,7 @@ class DatabaseManager:
         lookup_status: str = "",
         lookup_error: str = "",
     ) -> None:
-        """Store a detection record. Backwards-compatible with older callers.
-
-        Additional fields: source_type, original_image, processed_image, cropped_plate, lookup_status, lookup_error
-        """
+        """Store an ANPR detection record."""
         now = datetime.utcnow()
         with self._connect() as conn:
             conn.execute(
@@ -370,16 +345,27 @@ class DatabaseManager:
             )
             conn.commit()
 
-    def add_vehicle_record(self, plate_number: str, vehicle_type: str = 'Unknown', owner_name: str = 'Unknown', registration_state: str | None = None, vehicle_color: str | None = None, fastag_status: str | None = None, fastag_balance: float | None = None) -> None:
-        """Create a minimal vehicle record when no CarInfo exists yet."""
+    def add_vehicle_record(
+        self,
+        plate_number: str,
+        vehicle_type: str = "Unknown",
+        owner_name: str = "Unknown",
+        registration_state: str | None = None,
+        vehicle_color: str | None = None,
+        fastag_status: str | None = None,
+        fastag_balance: float | None = None,
+        source: str = "local_database",
+        verified: bool = False,
+    ) -> None:
+        """Create a local vehicle record tagged with source and verified status."""
         plate = clean_plate_text(plate_number)
         with self._connect() as conn:
             conn.execute(
                 """
                 INSERT OR IGNORE INTO vehicles (
                     plate_number, vehicle_type, owner_name, registration_state, vehicle_color,
-                    fastag_status, fastag_balance
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    fastag_status, fastag_balance, source, verified
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     plate,
@@ -389,190 +375,25 @@ class DatabaseManager:
                     vehicle_color,
                     fastag_status,
                     fastag_balance,
+                    source,
+                    1 if verified else 0,
                 ),
             )
             conn.commit()
-
-    def update_vehicle(self, plate_number: str, data: dict[str, Any]) -> bool:
-        """Update an existing vehicle record or create a new one."""
-        plate = clean_plate_text(plate_number)
-        cols = []
-        vals = []
-        for k, v in data.items():
-            cols.append(f"{k} = ?")
-            vals.append(v)
-        if not cols:
-            return False
-        with self._connect() as conn:
-            update_query = f"UPDATE vehicles SET {', '.join(cols)} WHERE plate_number = ?"
-            cursor = conn.execute(update_query, vals + [plate])
-            if cursor.rowcount == 0:
-                columns = ["plate_number"] + [c.split(" = ")[0] for c in cols]
-                placeholders = ", ".join(["?" for _ in columns])
-                insert_query = f"INSERT INTO vehicles ({', '.join(columns)}) VALUES ({placeholders})"
-                conn.execute(insert_query, [plate] + vals)
-            conn.commit()
-        return True
-
-    def delete_vehicle(self, plate_number: str) -> bool:
-        """Delete a vehicle record by plate number."""
-        plate = clean_plate_text(plate_number)
-        with self._connect() as conn:
-            conn.execute("DELETE FROM vehicles WHERE plate_number = ?", (plate,))
-            conn.commit()
-        return True
-
-    def add_live_scan_event(
-        self,
-        plate_number: str,
-        vehicle_type: str,
-        confidence: float,
-        camera_name: str,
-        source_url: str,
-        gate_open: bool,
-        status: str,
-        note: str = "",
-    ) -> None:
-        """Persist a live-scan event for auditing and history."""
-        with self._connect() as conn:
-            conn.execute(
-                """
-                INSERT INTO live_scan_events (
-                    plate_number, vehicle_type, confidence, plate_confidence, camera_name, source_url, note, gate_open, status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    plate_number,
-                    vehicle_type,
-                    confidence,
-                    confidence,
-                    camera_name,
-                    source_url,
-                    note,
-                    int(gate_open),
-                    status,
-                ),
-            )
-            conn.commit()
-
-    def get_live_scan_events(self, limit: int = 10) -> list[dict[str, Any]]:
-        """Return recent live-scan events ordered by newest first."""
-        with self._connect() as conn:
-            rows = conn.execute(
-                "SELECT * FROM live_scan_events ORDER BY id DESC LIMIT ?",
-                (limit,),
-            ).fetchall()
-        return [dict(row) for row in rows]
-
-    def get_dashboard_stats(self) -> dict[str, Any]:
-        """Compute dashboard summary values."""
-        with self._connect() as conn:
-            total_entries = conn.execute("SELECT COUNT(*) AS count FROM detections").fetchone()["count"]
-            today = datetime.utcnow().strftime("%Y-%m-%d")
-            today_vehicles = conn.execute("SELECT COUNT(*) AS count FROM detections WHERE detection_date = ?", (today,)).fetchone()["count"]
-            blacklist_count = conn.execute("SELECT COUNT(*) AS count FROM blacklist").fetchone()["count"]
-        return {
-            "total_vehicles_today": today_vehicles,
-            "total_entries": total_entries,
-            "live_camera_status": "Connected",
-            "todays_reports": today_vehicles,
-            "blacklist_count": blacklist_count,
-        }
-
-    def get_recent_detections(self, limit: int = 10) -> list[dict[str, Any]]:
-        """Return recent detections for the UI."""
-        with self._connect() as conn:
-            rows = conn.execute(
-                "SELECT * FROM detections ORDER BY id DESC LIMIT ?",
-                (limit,),
-            ).fetchall()
-        return [dict(row) for row in rows]
-
-    def search_detections(self, plate: str | None = None, date: str | None = None, vehicle_type: str | None = None) -> list[dict[str, Any]]:
-        """Search detections using the supplied filters."""
-        query = "SELECT * FROM detections WHERE 1=1"
-        params: list[Any] = []
-        if plate:
-            query += " AND plate_number LIKE ?"
-            params.append(f"%{plate}%")
-        if date:
-            query += " AND detection_date = ?"
-            params.append(date)
-        if vehicle_type:
-            query += " AND vehicle_type LIKE ?"
-            params.append(f"%{vehicle_type}%")
-        query += " ORDER BY id DESC"
-        with self._connect() as conn:
-            rows = conn.execute(query, params).fetchall()
-        return [dict(row) for row in rows]
-
-    def get_reports(self, period: str = "daily") -> list[dict[str, Any]]:
-        """Return aggregated reports for the selected period."""
-        today = datetime.utcnow().strftime("%Y-%m-%d")
-        with self._connect() as conn:
-            if period == "weekly":
-                start = (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d")
-                rows = conn.execute("SELECT detection_date AS period, COUNT(*) AS count FROM detections WHERE detection_date >= ? GROUP BY detection_date ORDER BY detection_date", (start,)).fetchall()
-            elif period == "monthly":
-                rows = conn.execute("SELECT substr(detection_date, 1, 7) AS period, COUNT(*) AS count FROM detections GROUP BY substr(detection_date, 1, 7) ORDER BY period", ()).fetchall()
-            else:
-                rows = conn.execute("SELECT detection_date AS period, COUNT(*) AS count FROM detections WHERE detection_date = ? GROUP BY detection_date", (today,)).fetchall()
-        return [dict(row) for row in rows]
-
-    def add_blacklist_entry(self, plate_number: str, reason: str) -> None:
-        """Add a plate number to the blacklist."""
-        with self._connect() as conn:
-            conn.execute("INSERT OR IGNORE INTO blacklist (plate_number, reason) VALUES (?, ?)", (plate_number, reason))
-            conn.commit()
-
-    def get_blacklist_entries(self) -> list[dict[str, Any]]:
-        """Return all blacklist entries."""
-        with self._connect() as conn:
-            rows = conn.execute("SELECT * FROM blacklist ORDER BY id DESC").fetchall()
-        return [dict(row) for row in rows]
-
-    def delete_blacklist_entry(self, blacklist_id: int) -> None:
-        """Remove a blacklist entry."""
-        with self._connect() as conn:
-            conn.execute("DELETE FROM blacklist WHERE id = ?", (blacklist_id,))
-            conn.commit()
-
-    def get_blacklist_entry(self, plate_number: str) -> dict[str, Any] | None:
-        """Return a blacklist record for the given plate."""
-        with self._connect() as conn:
-            row = conn.execute("SELECT * FROM blacklist WHERE plate_number = ?", (plate_number,)).fetchone()
-        return dict(row) if row else None
-
-    def get_last_detection(self, plate_number: str) -> dict[str, Any] | None:
-        """Return the most recent detection for the given plate."""
-        with self._connect() as conn:
-            row = conn.execute(
-                "SELECT * FROM detections WHERE plate_number = ? ORDER BY created_at DESC LIMIT 1",
-                (plate_number,),
-            ).fetchone()
-        return dict(row) if row else None
-
-    def can_save_detection(self, plate_number: str, max_seconds: int) -> bool:
-        """Return whether a new detection for this plate should be stored."""
-        last = self.get_last_detection(plate_number)
-        if not last or not last.get("created_at"):
-            return True
-        try:
-            last_time = datetime.fromisoformat(last["created_at"])
-        except ValueError:
-            return True
-        return (datetime.utcnow() - last_time).total_seconds() > max_seconds
 
     def get_vehicle_record(self, plate_number: str) -> dict[str, Any] | None:
-        """Fetch a local vehicle record for simulation."""
+        """Fetch a local vehicle record."""
         normalized_plate = clean_plate_text(plate_number or "")
         with self._connect() as conn:
             row = conn.execute("SELECT * FROM vehicles WHERE plate_number = ?", (normalized_plate,)).fetchone()
         return dict(row) if row else None
 
     def get_vehicle_info(self, plate_number: str) -> dict[str, Any] | None:
-        """Fetch a vehicle record together with FASTag account details."""
+        """Fetch vehicle registration record together with FASTag details and data provenance tags."""
         normalized_plate = clean_plate_text(plate_number or "")
+        if not normalized_plate:
+            return None
+
         with self._connect() as conn:
             row = conn.execute(
                 """
@@ -586,52 +407,44 @@ class DatabaseManager:
                 """,
                 (normalized_plate,),
             ).fetchone()
-        return dict(row) if row else None
 
-    def get_cached_vehicle_info(self, plate_number: str) -> dict[str, Any] | None:
-        """Return cached vehicle info only for permitted external/RTO sources."""
-        normalized_plate = clean_plate_text(plate_number or "")
-        allowed_sources = ["external", "external_api", "rto_api", "cached", "external_rto", "rto_cached"]
-        placeholders = ",".join("?" for _ in allowed_sources)
-        with self._connect() as conn:
-            row = conn.execute(
-                f"""
-                SELECT
-                    v.*,
-                    fa.balance AS fastag_balance,
-                    fa.status AS fastag_status
-                FROM vehicles v
-                LEFT JOIN fastag_accounts fa ON v.plate_number = fa.plate_number
-                WHERE v.plate_number = ? AND v.data_source IN ({placeholders})
-                """,
-                [normalized_plate] + allowed_sources,
-            ).fetchone()
-        return dict(row) if row else None
+        if not row:
+            return None
 
-    def get_fastag_account(self, plate_number: str) -> dict[str, Any] | None:
-        """Return FASTag account details for a plate."""
-        normalized_plate = clean_plate_text(plate_number or "")
-        with self._connect() as conn:
-            row = conn.execute("SELECT * FROM fastag_accounts WHERE plate_number = ?", (normalized_plate,)).fetchone()
-        return dict(row) if row else None
+        res = dict(row)
+        src = res.get("source") or res.get("data_source") or "local_database"
+        is_verified = bool(res.get("verified"))
+
+        if src == "official_authorized_api" and is_verified:
+            source_label = "Official Authorized API"
+            status_label = "VERIFIED"
+        elif src == "imported_dataset":
+            source_label = "Imported Dataset"
+            status_label = "NOT VERIFIED"
+        elif src == "local_database":
+            source_label = "Local Database"
+            status_label = "NOT VERIFIED"
+        else:
+            source_label = "Unknown / Unverified"
+            status_label = "NOT VERIFIED"
+
+        res["source"] = src
+        res["source_label"] = source_label
+        res["verified"] = is_verified
+        res["verification_status"] = status_label
+        res["verification_message"] = "Official Authorized Registration" if is_verified else "Vehicle details unverified (local/dataset record)"
+        return res
 
     def fetch_and_save_rto_record(self, plate_number: str) -> dict[str, Any] | None:
-        """Attempt to fetch vehicle details from an external RTO API and save locally.
-
-        The external RTO API URL should be configured in `Config.RTO_API_URL` and is
-        expected to return JSON with keys matching the `vehicles` table columns.
-        This method stores the fetched record into the local vehicle registry so it
-        can be returned immediately as CarInfo-style vehicle details.
-        """
-        from config import Config
+        """Attempt to fetch vehicle details from an official external RTO API and tag as verified."""
         import json
 
         normalized_plate = clean_plate_text(plate_number or "")
         api_url = getattr(Config, "RTO_API_URL", None)
         if not api_url or not normalized_plate:
             return None
+
         try:
-            # Use requests if available, otherwise fall back to urllib
             try:
                 import requests
                 headers = {}
@@ -662,34 +475,25 @@ class DatabaseManager:
                 return None
 
             plate_value = data.get("plate_number") or data.get("plate") or plate_number
+            now_iso = datetime.utcnow().isoformat()
+
+            data["source"] = "official_authorized_api"
+            data["verified"] = 1
+            data["verified_at"] = now_iso
+
             vehicle_fields = (
-                "plate_number",
-                "vehicle_type",
-                "manufacturer",
-                "model",
-                "variant",
-                "vehicle_color",
-                "fuel_type",
-                "engine_number",
-                "chassis_number",
-                "registration_date",
-                "registration_state",
-                "insurance_status",
-                "insurance_expiry",
-                "puc_status",
-                "puc_expiry",
-                "fastag_status",
-                "fastag_balance",
-                "permit_status",
-                "fitness_status",
-                "rc_status",
-                "owner_name",
-                "city",
-                "district",
-                "state",
+                "plate_number", "vehicle_type", "manufacturer", "model", "variant", "vehicle_color",
+                "fuel_type", "engine_number", "chassis_number", "registration_date", "registration_state",
+                "insurance_status", "insurance_expiry", "puc_status", "puc_expiry", "fastag_status",
+                "fastag_balance", "permit_status", "fitness_status", "rc_status", "owner_name", "city",
+                "district", "state", "source", "verified", "verified_at"
             )
             values = [data.get(k) for k in vehicle_fields]
             values[0] = plate_value
+            values[-3] = "official_authorized_api"
+            values[-2] = 1
+            values[-1] = now_iso
+
             payload = json.dumps(data)
             with self._connect() as conn:
                 conn.execute(
@@ -698,119 +502,42 @@ class DatabaseManager:
                         plate_number, vehicle_type, manufacturer, model, variant, vehicle_color,
                         fuel_type, engine_number, chassis_number, registration_date, registration_state,
                         insurance_status, insurance_expiry, puc_status, puc_expiry, fastag_status,
-                        fastag_balance, permit_status, fitness_status, rc_status, owner_name, city, district, state
-                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                        fastag_balance, permit_status, fitness_status, rc_status, owner_name, city,
+                        district, state, source, verified, verified_at
+                    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                     """,
                     values,
                 )
                 conn.execute(
                     "INSERT OR REPLACE INTO fastag_accounts (plate_number, balance, status, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)",
-                    (plate_value, data.get("fastag_balance") or 0.0, data.get("fastag_status") or "Unknown"),
+                    (plate_value, data.get("fastag_balance") or 0.0, data.get("fastag_status") or "Active"),
                 )
                 conn.execute("INSERT INTO rto_imports (plate_number, payload) VALUES (?, ?)", (plate_value, payload))
                 conn.commit()
+
             return data
         except Exception:
             return None
 
-    def fetch_rto_data(self, plate_number: str) -> dict[str, Any] | None:
-        """Fetch raw RTO data from external API without saving.
-
-        Returns dict on success, None otherwise.
-        """
-        from config import Config
-        import json
-
-        api_url = getattr(Config, "RTO_API_URL", None)
-        if not api_url:
-            return None
-        try:
-            try:
-                import requests
-                headers = {}
-                params = {"plate": plate_number}
-                if getattr(Config, "RTO_API_PROVIDER", None):
-                    params["provider"] = Config.RTO_API_PROVIDER
-                if getattr(Config, "RTO_API_KEY", None):
-                    headers["Authorization"] = f"Bearer {Config.RTO_API_KEY}"
-                if getattr(Config, "RTO_API_CLIENT_ID", None):
-                    headers["X-Client-Id"] = Config.RTO_API_CLIENT_ID
-                if getattr(Config, "RTO_API_CLIENT_SECRET", None):
-                    headers["X-Client-Secret"] = Config.RTO_API_CLIENT_SECRET
-                resp = requests.get(api_url, headers=headers, params=params, timeout=5)
-                if resp.status_code != 200:
-                    return None
-                data = resp.json()
-            except Exception:
-                from urllib import request as urlreq, parse
-                params = {"plate": plate_number}
-                if getattr(Config, "RTO_API_PROVIDER", None):
-                    params["provider"] = Config.RTO_API_PROVIDER
-                q = parse.urlencode(params)
-                with urlreq.urlopen(f"{api_url}?{q}", timeout=5) as r:
-                    raw = r.read()
-                    data = json.loads(raw.decode("utf-8"))
-            return data if isinstance(data, dict) else None
-        except Exception:
-            return None
-
-    def add_rto_import(self, data: dict[str, Any]) -> int:
-        """Insert an RTO import payload into `rto_imports` and return the id."""
-        import json
-        plate = data.get("plate_number") or data.get("plate")
-        payload = json.dumps(data)
-        with self._connect() as conn:
-            cur = conn.execute("INSERT INTO rto_imports (plate_number, payload) VALUES (?, ?)", (plate, payload))
-            conn.commit()
-            return cur.lastrowid
-
-    def list_rto_imports(self, only_pending: bool = True) -> list[dict[str, Any]]:
-        with self._connect() as conn:
-            if only_pending:
-                rows = conn.execute("SELECT * FROM rto_imports WHERE approved = 0 ORDER BY id DESC").fetchall()
-            else:
-                rows = conn.execute("SELECT * FROM rto_imports ORDER BY id DESC").fetchall()
-        return [dict(row) for row in rows]
-
-    def get_rto_import(self, import_id: int) -> dict[str, Any] | None:
-        with self._connect() as conn:
-            row = conn.execute("SELECT * FROM rto_imports WHERE id = ?", (import_id,)).fetchone()
-        return dict(row) if row else None
-
     def approve_rto_import(self, import_id: int) -> bool:
-        """Approve an RTO import and upsert into vehicles and fastag_accounts."""
+        """Approve an RTO import and upsert into vehicles with source='imported_dataset' and verified=0."""
         import json
         rec = self.get_rto_import(import_id)
         if not rec:
             return False
         data = json.loads(rec["payload"])
+        
         vehicle_fields = (
-            "plate_number",
-            "vehicle_type",
-            "manufacturer",
-            "model",
-            "variant",
-            "vehicle_color",
-            "fuel_type",
-            "engine_number",
-            "chassis_number",
-            "registration_date",
-            "registration_state",
-            "insurance_status",
-            "insurance_expiry",
-            "puc_status",
-            "puc_expiry",
-            "fastag_status",
-            "fastag_balance",
-            "permit_status",
-            "fitness_status",
-            "rc_status",
-            "owner_name",
-            "city",
-            "district",
-            "state",
+            "plate_number", "vehicle_type", "manufacturer", "model", "variant", "vehicle_color",
+            "fuel_type", "engine_number", "chassis_number", "registration_date", "registration_state",
+            "insurance_status", "insurance_expiry", "puc_status", "puc_expiry", "fastag_status",
+            "fastag_balance", "permit_status", "fitness_status", "rc_status", "owner_name", "city",
+            "district", "state"
         )
         values = [data.get(k) for k in vehicle_fields]
+        plate_val = data.get("plate_number") or data.get("plate")
+        values[0] = plate_val
+
         with self._connect() as conn:
             conn.execute(
                 """
@@ -818,22 +545,48 @@ class DatabaseManager:
                     plate_number, vehicle_type, manufacturer, model, variant, vehicle_color,
                     fuel_type, engine_number, chassis_number, registration_date, registration_state,
                     insurance_status, insurance_expiry, puc_status, puc_expiry, fastag_status,
-                    fastag_balance, permit_status, fitness_status, rc_status, owner_name, city, district, state
-                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                    fastag_balance, permit_status, fitness_status, rc_status, owner_name, city, district, state,
+                    source, verified
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, 'imported_dataset', 0)
                 """,
                 values,
             )
-            # Upsert fastag account
             fastag_balance = data.get("fastag_balance")
             fastag_status = data.get("fastag_status")
             if fastag_balance is not None or fastag_status is not None:
                 conn.execute(
                     "INSERT OR REPLACE INTO fastag_accounts (plate_number, balance, status, created_at) VALUES (?, ?, ?, CURRENT_TIMESTAMP)",
-                    (data.get("plate_number") or data.get("plate"), fastag_balance or 0.0, fastag_status or "Unknown"),
+                    (plate_val, fastag_balance or 0.0, fastag_status or "Active"),
                 )
             conn.execute("UPDATE rto_imports SET approved = 1 WHERE id = ?", (import_id,))
             conn.commit()
         return True
+
+    def get_blacklist_entry(self, plate_number: str) -> dict[str, Any] | None:
+        """Return a blacklist record for the given plate."""
+        with self._connect() as conn:
+            row = conn.execute("SELECT * FROM blacklist WHERE plate_number = ?", (plate_number,)).fetchone()
+        return dict(row) if row else None
+
+    def get_last_detection(self, plate_number: str) -> dict[str, Any] | None:
+        """Return the most recent detection for the given plate."""
+        with self._connect() as conn:
+            row = conn.execute(
+                "SELECT * FROM detections WHERE plate_number = ? ORDER BY created_at DESC LIMIT 1",
+                (plate_number,),
+            ).fetchone()
+        return dict(row) if row else None
+
+    def can_save_detection(self, plate_number: str, max_seconds: int) -> bool:
+        """Return whether a new detection for this plate should be stored."""
+        last = self.get_last_detection(plate_number)
+        if not last or not last.get("created_at"):
+            return True
+        try:
+            last_time = datetime.fromisoformat(last["created_at"])
+        except ValueError:
+            return True
+        return (datetime.utcnow() - last_time).total_seconds() > max_seconds
 
     def update_fastag_balance(self, plate_number: str, balance: float) -> None:
         """Update FASTag balance for a plate."""
@@ -885,8 +638,120 @@ class DatabaseManager:
             )
             conn.commit()
 
+    def get_dashboard_stats(self) -> dict[str, Any]:
+        """Compute dashboard summary statistics."""
+        with self._connect() as conn:
+            today = datetime.utcnow().strftime("%Y-%m-%d")
+            total_entries = conn.execute("SELECT COUNT(*) AS count FROM detections").fetchone()["count"]
+            today_vehicles = conn.execute("SELECT COUNT(*) AS count FROM detections WHERE detection_date = ?", (today,)).fetchone()["count"]
+            unique_today = conn.execute("SELECT COUNT(DISTINCT plate_number) AS count FROM detections WHERE detection_date = ?", (today,)).fetchone()["count"]
+            blacklist_count = conn.execute("SELECT COUNT(*) AS count FROM blacklist").fetchone()["count"]
+            
+            verified_count = conn.execute("SELECT COUNT(*) AS count FROM vehicles WHERE verified = 1").fetchone()["count"]
+            total_vehicles = conn.execute("SELECT COUNT(*) AS count FROM vehicles").fetchone()["count"]
+            verification_rate = round((verified_count / float(max(1, total_vehicles))) * 100.0, 1)
+
+        return {
+            "total_vehicles_today": today_vehicles,
+            "unique_vehicles_today": unique_today,
+            "total_entries": total_entries,
+            "blacklist_count": blacklist_count,
+            "verified_count": verified_count,
+            "verification_rate": verification_rate,
+            "live_camera_status": "Connected",
+            "todays_reports": today_vehicles,
+        }
+
+    def get_recent_detections(self, limit: int = 10) -> list[dict[str, Any]]:
+        """Return recent detections for the UI."""
+        with self._connect() as conn:
+            rows = conn.execute("SELECT * FROM detections ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
+        return [dict(row) for row in rows]
+
+    def search_detections(self, plate: str | None = None, date: str | None = None, vehicle_type: str | None = None) -> list[dict[str, Any]]:
+        """Search detections using supplied filters."""
+        query = "SELECT * FROM detections WHERE 1=1"
+        params: list[Any] = []
+        if plate:
+            query += " AND plate_number LIKE ?"
+            params.append(f"%{plate}%")
+        if date:
+            query += " AND detection_date = ?"
+            params.append(date)
+        if vehicle_type:
+            query += " AND vehicle_type LIKE ?"
+            params.append(f"%{vehicle_type}%")
+        query += " ORDER BY id DESC"
+        with self._connect() as conn:
+            rows = conn.execute(query, params).fetchall()
+        return [dict(row) for row in rows]
+
+    def add_blacklist_entry(self, plate_number: str, reason: str) -> None:
+        with self._connect() as conn:
+            conn.execute("INSERT OR IGNORE INTO blacklist (plate_number, reason) VALUES (?, ?)", (plate_number, reason))
+            conn.commit()
+
+    def get_blacklist_entries(self) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            rows = conn.execute("SELECT * FROM blacklist ORDER BY id DESC").fetchall()
+        return [dict(row) for row in rows]
+
+    def delete_blacklist_entry(self, blacklist_id: int) -> None:
+        with self._connect() as conn:
+            conn.execute("DELETE FROM blacklist WHERE id = ?", (blacklist_id,))
+            conn.commit()
+
+    def add_live_scan_event(self, plate_number: str, vehicle_type: str, confidence: float, camera_name: str = "Camera", source_url: str = "", note: str = "", gate_open: bool = False, status: str = "") -> None:
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO live_scan_events (plate_number, vehicle_type, confidence, camera_name, source_url, note, gate_open, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (plate_number, vehicle_type, confidence, camera_name, source_url, note, int(gate_open), status),
+            )
+            conn.commit()
+
+    def get_live_scan_events(self, limit: int = 10) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            rows = conn.execute("SELECT * FROM live_scan_events ORDER BY id DESC LIMIT ?", (limit,)).fetchall()
+        return [dict(row) for row in rows]
+
+    def get_reports(self, period: str = "daily") -> list[dict[str, Any]]:
+        today = datetime.utcnow().strftime("%Y-%m-%d")
+        with self._connect() as conn:
+            if period == "weekly":
+                start = (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d")
+                rows = conn.execute("SELECT detection_date AS period, COUNT(*) AS count FROM detections WHERE detection_date >= ? GROUP BY detection_date ORDER BY detection_date", (start,)).fetchall()
+            elif period == "monthly":
+                rows = conn.execute("SELECT substr(detection_date, 1, 7) AS period, COUNT(*) AS count FROM detections GROUP BY substr(detection_date, 1, 7) ORDER BY period", ()).fetchall()
+            else:
+                rows = conn.execute("SELECT detection_date AS period, COUNT(*) AS count FROM detections WHERE detection_date = ? GROUP BY detection_date", (today,)).fetchall()
+        return [dict(row) for row in rows]
+
+    def add_rto_import(self, data: dict[str, Any]) -> int:
+        import json
+        plate = data.get("plate_number") or data.get("plate")
+        payload = json.dumps(data)
+        with self._connect() as conn:
+            cur = conn.execute("INSERT INTO rto_imports (plate_number, payload) VALUES (?, ?)", (plate, payload))
+            conn.commit()
+            return cur.lastrowid
+
+    def list_rto_imports(self, only_pending: bool = True) -> list[dict[str, Any]]:
+        with self._connect() as conn:
+            if only_pending:
+                rows = conn.execute("SELECT * FROM rto_imports WHERE approved = 0 ORDER BY id DESC").fetchall()
+            else:
+                rows = conn.execute("SELECT * FROM rto_imports ORDER BY id DESC").fetchall()
+        return [dict(row) for row in rows]
+
+    def get_rto_import(self, import_id: int) -> dict[str, Any] | None:
+        with self._connect() as conn:
+            row = conn.execute("SELECT * FROM rto_imports WHERE id = ?", (import_id,)).fetchone()
+        return dict(row) if row else None
+
     def get_toll_transactions(self) -> list[dict[str, Any]]:
-        """Return toll transactions for the UI."""
         with self._connect() as conn:
             rows = conn.execute("SELECT * FROM toll_transactions ORDER BY id DESC LIMIT 20").fetchall()
         return [dict(row) for row in rows]

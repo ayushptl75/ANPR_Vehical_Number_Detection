@@ -1,4 +1,4 @@
-"""End-to-end ANPR pipeline for vehicle, plate, OCR, and validation."""
+"""End-to-end unified ANPR detection pipeline for vehicle detection, plate detection, OCR, and validation."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,17 +7,21 @@ from typing import Any
 import cv2
 import numpy as np
 
+from config import Config
+from modules.geometry import add_controlled_padding, clamp_bbox, crop_to_global_bbox, is_bbox_center_inside, validate_plate_crop_dimensions
 from modules.llm import LLMNormalizer
-from modules.ocr import OCRReader
+from modules.ocr_reader import OCRReader
 from modules.plate_detector import PlateDetector
 from modules.preprocessing import PlatePreprocessor
+from modules.utils import get_logger, is_valid_indian_plate, validate_indian_plate_with_details
 from modules.validator import PlateValidator
 
 
 class ANPRPipeline:
-    """Coordinate vehicle detection, plate detection, OCR, and validation."""
+    """Unified core ANPR detection pipeline shared across Image Upload, Video, and Stream Processing."""
 
     def __init__(self, vehicle_detector: Any, plate_detector: Any | None = None, ocr_reader: Any | None = None, llm_reader: Any | None = None) -> None:
+        self.logger = get_logger("pipeline")
         self.vehicle_detector = vehicle_detector
         self.plate_detector = plate_detector or PlateDetector()
         self.ocr_reader = ocr_reader or OCRReader()
@@ -27,35 +31,79 @@ class ANPRPipeline:
         self.output_dir = Path("static/output")
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def process_frame(self, frame: Any, camera_state: str = "") -> dict[str, Any]:
-        image = np.array(frame)
-        if image.size == 0:
-            return {"status": "FAILED", "reason": "No image provided"}
+    def process_image(self, frame: Any, camera_state: str = "") -> dict[str, Any]:
+        """Execute the complete unified ANPR pipeline against a single image."""
+        if frame is None:
+            return {
+                "status": "FAILED",
+                "reason": "No image provided",
+                "confidence": 0.0,
+                "ocr_confidence": 0.0,
+                "selected_plate_confidence": 0.0,
+                "plate_number": "NOT_DETECTED",
+            }
 
+        image = np.array(frame)
+        if image is None or image.size == 0:
+            return {
+                "status": "FAILED",
+                "reason": "Empty image provided",
+                "confidence": 0.0,
+                "ocr_confidence": 0.0,
+                "selected_plate_confidence": 0.0,
+                "plate_number": "NOT_DETECTED",
+            }
+
+        annotated = image.copy()
+        self._save_image(image, "original.jpg")
+
+        # Step 1: Vehicle Detection
         vehicles = self.vehicle_detector.detect(image)
         if not vehicles:
-            return {"status": "FAILED", "reason": "No valid vehicle detected"}
+            return {
+                "status": "FAILED",
+                "reason": "No valid vehicle detected",
+                "annotated_frame": annotated,
+                "confidence": 0.0,
+                "ocr_confidence": 0.0,
+                "selected_plate_confidence": 0.0,
+                "plate_number": "NOT_DETECTED",
+            }
 
         vehicle = max(vehicles, key=lambda item: float(item.get("confidence", 0.0)))
-        vehicle_bbox = vehicle.get("bbox") or [0, 0, image.shape[1], image.shape[0]]
-        vehicle_crop = image[vehicle_bbox[1]:vehicle_bbox[3], vehicle_bbox[0]:vehicle_bbox[2]]
-        self._save_image(image, "original.jpg")
+        vehicle_bbox = clamp_bbox(vehicle.get("bbox") or [0, 0, image.shape[1], image.shape[0]], image.shape)
+        vx1, vy1, vx2, vy2 = vehicle_bbox
+        vehicle_label = str(vehicle.get("label", "vehicle")).upper()
+        vehicle_conf = float(vehicle.get("confidence", 0.0))
+
+        vehicle_crop = image[vy1:vy2, vx1:vx2] if (vx2 > vx1 and vy2 > vy1) else image
         self._save_image(vehicle_crop, "vehicle_detected.jpg")
 
-        print("[DEBUG] Vehicle Confidence:", vehicle.get("confidence"))
-        print("[DEBUG] Vehicle Coordinates:", vehicle_bbox)
+        cv2.rectangle(annotated, (vx1, vy1), (vx2, vy2), (0, 255, 0), 2)
+        cv2.putText(annotated, vehicle_label, (vx1, max(vy1 - 10, 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
+        # Step 2: Dedicated Plate Detection on Vehicle Crop
         plate_candidates = self.plate_detector.detect(vehicle_crop)
         if not plate_candidates:
-            return {"status": "FAILED", "reason": "License plate not detected"}
+            return {
+                "status": "FAILED",
+                "reason": "License plate not detected",
+                "vehicle": vehicle,
+                "vehicle_crop": vehicle_crop,
+                "annotated_frame": annotated,
+                "confidence": 0.0,
+                "ocr_confidence": 0.0,
+                "selected_plate_confidence": 0.0,
+                "plate_number": "NOT_DETECTED",
+            }
 
         selected_plate = None
         for candidate in plate_candidates:
             bbox = candidate.get("bbox") or []
             conf = float(candidate.get("confidence", 0.0))
-            if conf < 0.7:
+            if conf < Config.PLATE_CONFIDENCE_THRESHOLD:
                 continue
-            if not self._is_within_vehicle(bbox, vehicle_bbox):
+            if not self._is_within_vehicle(bbox, vehicle_bbox, image.shape):
                 continue
             if not self._meets_geometry(bbox):
                 continue
@@ -63,56 +111,101 @@ class ANPRPipeline:
             break
 
         if selected_plate is None:
-            return {"status": "FAILED", "reason": "License plate not detected"}
+            selected_plate = plate_candidates[0]
 
-        x1, y1, x2, y2 = [int(v) for v in selected_plate["bbox"]]
-        x1 = max(0, x1)
-        y1 = max(0, y1)
-        x2 = min(vehicle_crop.shape[1], x2)
-        y2 = min(vehicle_crop.shape[0], y2)
-        pad = 5
-        x1 = max(0, x1 - pad)
-        y1 = max(0, y1 - pad)
-        x2 = min(vehicle_crop.shape[1], x2 + pad)
-        y2 = min(vehicle_crop.shape[0], y2 + pad)
-        plate_crop = vehicle_crop[y1:y2, x1:x2]
+        local_bbox = selected_plate["bbox"]
+        plate_det_conf = float(selected_plate.get("confidence", 0.0))
+
+        # Step 3 & 4: Controlled Padding & Coordinate Transformation
+        padded_local_bbox = add_controlled_padding(local_bbox, vehicle_crop.shape, pad_percent=0.05, min_pad_px=4)
+        px1, py1, px2, py2 = padded_local_bbox
+        plate_crop = vehicle_crop[py1:py2, px1:px2]
+
+        global_plate_bbox = crop_to_global_bbox(local_bbox, vx1, vy1, image.shape)
+        gx1, gy1, gx2, gy2 = global_plate_bbox
+
         self._save_image(plate_crop, "cropped_plate.jpg")
 
-        print("[DEBUG] Plate Confidence:", selected_plate.get("confidence"))
-        print("[DEBUG] Plate Coordinates:", [x1, y1, x2, y2])
-        print("[DEBUG] Plate Width:", x2 - x1)
-        print("[DEBUG] Plate Height:", y2 - y1)
-        print("[DEBUG] Plate Aspect Ratio:", (x2 - x1) / float(max(1, y2 - y1)))
+        # Step 5: Crop Dimension Validation (Reject poor-quality/tiny plate crops)
+        if not validate_plate_crop_dimensions(
+            plate_crop,
+            min_width=Config.PLATE_MIN_WIDTH,
+            min_height=Config.PLATE_MIN_HEIGHT,
+            min_aspect=Config.PLATE_MIN_ASPECT_RATIO,
+            max_aspect=Config.PLATE_MAX_ASPECT_RATIO,
+        ):
+            return {
+                "status": "FAILED",
+                "reason": "Invalid or poor-quality plate crop dimensions",
+                "vehicle": vehicle,
+                "vehicle_crop": vehicle_crop,
+                "plate_crop": plate_crop,
+                "annotated_frame": annotated,
+                "confidence": 0.0,
+                "ocr_confidence": 0.0,
+                "selected_plate_confidence": plate_det_conf,
+                "plate_number": "NOT_DETECTED",
+            }
 
-        if plate_crop.size == 0:
-            return {"status": "FAILED", "reason": "License plate not detected"}
-
+        # Step 6: Step-by-Step Preprocessing & Multi-Variant OCR
         enhanced = self.preprocessor.preprocess(plate_crop)
         self._save_image(enhanced, "enhanced_plate.jpg")
-        ocr_result = self.ocr_reader.read(enhanced)
-        ocr_text = ocr_result.get("text", "")
-        ocr_confidence = float(ocr_result.get("confidence", 0.0))
-        print("[DEBUG] OCR Confidence:", ocr_confidence)
-        print("[DEBUG] OCR Text:", ocr_text)
-        if ocr_confidence < 0.7:
-            return {"status": "FAILED", "reason": "Low OCR confidence"}
 
-        normalized_text, llm_ok = self.llm_reader.normalize(ocr_text)
-        valid, final_text = self.validator.validate(normalized_text if llm_ok else ocr_text)
-        if not valid:
-            return {"status": "FAILED", "reason": "License plate not detected"}
+        ocr_result = self.ocr_reader.read(plate_crop)
+        raw_ocr_text = ocr_result.get("raw_text") or ocr_result.get("text") or ""
+        ocr_confidence = float(ocr_result.get("ocr_confidence") or ocr_result.get("confidence") or 0.0)
+        final_plate_text = str(ocr_result.get("plate_number") or ocr_result.get("text") or "")
+        val_status = str(ocr_result.get("validation_status") or "INVALID_FORMAT")
+        variant_used = str(ocr_result.get("processing_variant") or ocr_result.get("variant") or "standard")
 
-        self._save_image(image.copy(), "ocr_result.jpg")
-        print("[DEBUG] Final Plate:", final_text)
+        plate_label = final_plate_text or "PLATE"
+        cv2.rectangle(annotated, (gx1, gy1), (gx2, gy2), (0, 255, 255), 2)
+        cv2.putText(annotated, plate_label, (gx1, max(gy1 - 10, 20)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+        self._save_image(annotated, "ocr_result.jpg")
+
+        is_valid = bool(ocr_result.get("valid", is_valid_indian_plate(final_plate_text)))
+        if ocr_confidence < 0.70:
+            return {
+                "status": "FAILED",
+                "reason": "Low OCR confidence",
+                "plate": final_plate_text,
+                "plate_number": final_plate_text,
+                "ocr_confidence": round(ocr_confidence, 2),
+                "confidence": round(ocr_confidence, 2),
+                "annotated_frame": annotated,
+                "vehicle": vehicle,
+                "vehicle_crop": vehicle_crop,
+                "plate_crop": plate_crop,
+            }
+
         return {
             "status": "SUCCESS",
-            "plate": final_text,
+            "plate": final_plate_text,
+            "plate_number": final_plate_text,
+            "ocr_text": raw_ocr_text,
+            "ocr_confidence": round(ocr_confidence, 2),
+            "confidence": round(ocr_confidence, 2),
+            "selected_plate_confidence": round(plate_det_conf, 2),
+            "detected_vehicle_type": vehicle_label,
+            "detected_vehicle_confidence": round(vehicle_conf, 2),
             "state": camera_state or "Unknown",
-            "vehicle_type": vehicle.get("label", "vehicle"),
-            "ocr_confidence": round(ocr_confidence * 100, 2),
-            "ocr_text": ocr_text,
-            "bbox": [x1, y1, x2, y2],
+            "vehicle": vehicle,
+            "bbox": global_plate_bbox,
+            "global_plate_bbox": global_plate_bbox,
+            "local_plate_bbox": local_bbox,
+            "validation_status": val_status,
+            "processing_variant": variant_used,
+            "plate_valid": is_valid,
+            "original_image": image,
+            "annotated_frame": annotated,
+            "vehicle_crop": vehicle_crop,
+            "plate_crop": plate_crop,
+            "enhanced_plate": enhanced,
         }
+
+    def process_frame(self, frame: Any, camera_state: str = "") -> dict[str, Any]:
+        """Wrapper for process_image for backwards compatibility."""
+        return self.process_image(frame, camera_state=camera_state)
 
     def _save_image(self, image: Any, filename: str) -> None:
         output_path = self.output_dir / filename
@@ -121,17 +214,11 @@ class ANPRPipeline:
         img = np.array(image)
         if img.size == 0:
             return
-        if len(img.shape) == 2:
-            cv2.imwrite(str(output_path), img)
-        else:
-            cv2.imwrite(str(output_path), img)
+        cv2.imwrite(str(output_path), img)
 
-    def _is_within_vehicle(self, bbox: list[int], vehicle_bbox: list[int]) -> bool:
-        x1, y1, x2, y2 = bbox
-        vx1, vy1, vx2, vy2 = vehicle_bbox
-        center_x = (x1 + x2) / 2
-        center_y = (y1 + y2) / 2
-        return vx1 <= center_x <= vx2 and vy1 <= center_y <= vy2
+    def _is_within_vehicle(self, local_plate_bbox: list[int], vehicle_bbox: list[int], frame_shape: tuple[int, int]) -> bool:
+        global_plate_bbox = crop_to_global_bbox(local_plate_bbox, vehicle_bbox[0], vehicle_bbox[1], frame_shape)
+        return is_bbox_center_inside(global_plate_bbox, vehicle_bbox)
 
     def _meets_geometry(self, bbox: list[int]) -> bool:
         if len(bbox) != 4:
@@ -139,6 +226,7 @@ class ANPRPipeline:
         x1, y1, x2, y2 = bbox
         width = x2 - x1
         height = y2 - y1
-        if width < 60 or height < 20:
+        if width < Config.PLATE_MIN_WIDTH or height < Config.PLATE_MIN_HEIGHT:
             return False
-        return 2.0 <= (width / float(max(1, height))) <= 6.0
+        aspect = width / float(max(1, height))
+        return Config.PLATE_MIN_ASPECT_RATIO <= aspect <= Config.PLATE_MAX_ASPECT_RATIO

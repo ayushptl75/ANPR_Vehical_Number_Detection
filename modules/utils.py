@@ -54,69 +54,174 @@ def verify_password(password: str, hashed: str) -> bool:
     return expected == digest
 
 
+# Recognized Indian License Plate Structural Schemas
 INDIAN_PLATE_PATTERNS = [
-    re.compile(r"^[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{1,4}$"),
-    re.compile(r"^[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}$"),
+    re.compile(r"^[A-Z]{2}[0-9]{2}[A-Z]{1,3}[0-9]{4}$"),   # Standard 2-digit district: MH12AB1234
+    re.compile(r"^[A-Z]{2}[0-9]{1}[A-Z]{1,3}[0-9]{4}$"),   # Single-digit district: DL1CG5692
+    re.compile(r"^[0-9]{2}BH[0-9]{4}[A-Z]{1,2}$"),         # BH Series: 22BH1234A
+    re.compile(r"^BH[0-9]{2}[A-Z]{2}[0-9]{4}$"),          # BH Series alternative
+    re.compile(r"^[A-Z]{2}[0-9]{1,2}[A-Z]{1,3}[0-9]{1,3}$"), # Short number suffix: MH12AB123
+    re.compile(r"^[A-Z]{2,3}[0-9]{1,4}[A-Z]{0,2}$"),      # Vintage / Govt format
+    re.compile(r"^[0-9]{2}[A-Z]{1,3}[0-9]{4}$"),           # Alternate registration format
 ]
 
-LETTER_TO_DIGIT_SUBSTITUTIONS = {
+LETTER_TO_DIGIT_MAP = {
     "O": "0",
     "Q": "0",
     "I": "1",
     "L": "1",
-    "S": "5",
-    "B": "8",
     "Z": "2",
+    "S": "5",
     "G": "6",
+    "B": "8",
 }
 
-DIGIT_TO_LETTER_SUBSTITUTIONS = {v: k for k, v in LETTER_TO_DIGIT_SUBSTITUTIONS.items()}
+DIGIT_TO_LETTER_MAP = {
+    "0": "O",
+    "1": "I",
+    "2": "Z",
+    "5": "S",
+    "6": "G",
+    "8": "B",
+}
 
 
 def normalize_plate_text(text: str) -> str:
-    """Normalize OCR output into an uppercase plate text without separators."""
-    normalized = re.sub(r"[^A-Za-z0-9]", "", text.upper())
-    return normalized[:12]
+    """Sanitize OCR output into uppercase alphanumeric string, removing spaces, newlines, and punctuation."""
+    if not text:
+        return ""
+    # Strip spaces, newlines, tabs, and non-alphanumeric characters
+    sanitized = re.sub(r"[^A-Za-z0-9]", "", str(text).upper().strip())
+    return sanitized[:12]
 
 
 def positionally_correct_plate_text(text: str) -> str:
-    """Apply position-based corrections for common Indian plate OCR confusions."""
-    plate = list(normalize_plate_text(text))
-    if len(plate) < 6:
-        return "".join(plate)
+    """Apply position-aware character confusion correction without blind replacement."""
+    cleaned = normalize_plate_text(text)
+    if not cleaned or len(cleaned) < 5:
+        return cleaned
 
-    # First two characters should be letters.
-    for idx in range(min(2, len(plate))):
-        if plate[idx].isdigit():
-            plate[idx] = DIGIT_TO_LETTER_SUBSTITUTIONS.get(plate[idx], plate[idx])
+    # Exact match for 10-char standard plate (XX00XX0000) or 9-char single-digit district (XX0XX0000)
+    # Check if 10-char plate needs last-4 digit correction first
+    chars = list(cleaned)
+    n = len(chars)
 
-    # District/RTO code positions should be digits.
-    for idx in range(2, min(4, len(plate))):
-        if plate[idx].isalpha():
-            plate[idx] = LETTER_TO_DIGIT_SUBSTITUTIONS.get(plate[idx], plate[idx])
+    # Strategy 1: Standard 10-char / 4-digit suffix plate (e.g. MH12ABS234 -> MH12AB5234)
+    if n >= 8:
+        cand = list(chars)
+        # First 2 chars -> State code (Letters)
+        for i in range(min(2, n)):
+            if cand[i].isdigit() and cand[i] in DIGIT_TO_LETTER_MAP:
+                cand[i] = DIGIT_TO_LETTER_MAP[cand[i]]
+        # Next 2 chars -> District code (Digits)
+        for i in range(2, min(4, n)):
+            if cand[i].isalpha() and cand[i] in LETTER_TO_DIGIT_MAP:
+                cand[i] = LETTER_TO_DIGIT_MAP[cand[i]]
+        # Suffix (last 4 chars) -> Digits
+        for i in range(max(4, n - 4), n):
+            if cand[i].isalpha() and cand[i] in LETTER_TO_DIGIT_MAP:
+                cand[i] = LETTER_TO_DIGIT_MAP[cand[i]]
+        
+        test_str = "".join(cand)
+        if any(pattern.match(test_str) for pattern in INDIAN_PLATE_PATTERNS[:3]):
+            return test_str
 
-    # Series letters tend to follow the district portion.
-    for idx in range(4, max(4, len(plate) - 4)):
-        if plate[idx].isdigit():
-            plate[idx] = DIGIT_TO_LETTER_SUBSTITUTIONS.get(plate[idx], plate[idx])
+    # Direct match if no 10-char correction was required
+    if any(pattern.match(cleaned) for pattern in INDIAN_PLATE_PATTERNS):
+        return cleaned
 
-    # Final numeric portion should be digits.
-    for idx in range(max(4, len(plate) - 4), len(plate)):
-        if plate[idx].isalpha():
-            plate[idx] = LETTER_TO_DIGIT_SUBSTITUTIONS.get(plate[idx], plate[idx])
+    # Strategy 2: Single-digit district format (e.g. DL1CG5692)
+    if n >= 7:
+        cand = list(chars)
+        # First 2 chars -> State code
+        for i in range(min(2, n)):
+            if cand[i].isdigit() and cand[i] in DIGIT_TO_LETTER_MAP:
+                cand[i] = DIGIT_TO_LETTER_MAP[cand[i]]
+        # Index 2 -> 1-digit district
+        if cand[2].isalpha() and cand[2] in LETTER_TO_DIGIT_MAP:
+            cand[2] = LETTER_TO_DIGIT_MAP[cand[2]]
+        # Index 3-4 -> Series letters
+        for i in range(3, min(5, n - 4)):
+            if cand[i].isdigit() and cand[i] in DIGIT_TO_LETTER_MAP:
+                cand[i] = DIGIT_TO_LETTER_MAP[cand[i]]
+        # Last 4 chars -> Digits
+        for i in range(max(3, n - 4), n):
+            if cand[i].isalpha() and cand[i] in LETTER_TO_DIGIT_MAP:
+                cand[i] = LETTER_TO_DIGIT_MAP[cand[i]]
 
-    return "".join(plate)
+        test_str = "".join(cand)
+        if any(pattern.match(test_str) for pattern in INDIAN_PLATE_PATTERNS):
+            return test_str
+
+    # Strategy 3: BH-series format (e.g. 22BH1234A)
+    if n >= 8 and ("BH" in cleaned or "8H" in cleaned or "BH" in "".join(chars[2:4])):
+        cand = list(chars)
+        for i in range(min(2, n)):
+            if cand[i].isalpha() and cand[i] in LETTER_TO_DIGIT_MAP:
+                cand[i] = LETTER_TO_DIGIT_MAP[cand[i]]
+        test_str = "".join(cand)
+        if any(pattern.match(test_str) for pattern in INDIAN_PLATE_PATTERNS):
+            return test_str
+
+    return cleaned
 
 
 def is_valid_indian_plate(text: str) -> bool:
-    """Return True when a normalized plate matches common Indian registration formats."""
+    """Return True when a normalized plate matches recognized Indian registration schemas."""
     cleaned = normalize_plate_text(text)
-    if len(cleaned) < 6 or len(cleaned) > 12:
+    if len(cleaned) < 5 or len(cleaned) > 12:
         return False
     if any(pattern.match(cleaned) for pattern in INDIAN_PLATE_PATTERNS):
         return True
     corrected = positionally_correct_plate_text(cleaned)
     return any(pattern.match(corrected) for pattern in INDIAN_PLATE_PATTERNS)
+
+
+def validate_indian_plate_with_details(text: str, confidence: float, min_confidence: float = 0.45) -> dict[str, Any]:
+    """Validate plate text and return structured validation status metadata."""
+    cleaned = normalize_plate_text(text)
+    if not cleaned or len(cleaned) < 5:
+        return {
+            "plate_number": cleaned,
+            "is_valid": False,
+            "validation_status": "INVALID_FORMAT",
+            "was_corrected": False,
+        }
+
+    direct_match = any(pattern.match(cleaned) for pattern in INDIAN_PLATE_PATTERNS)
+    corrected = positionally_correct_plate_text(cleaned)
+    corrected_match = any(pattern.match(corrected) for pattern in INDIAN_PLATE_PATTERNS)
+
+    if confidence < min_confidence and not (direct_match or corrected_match):
+        return {
+            "plate_number": corrected if corrected_match else cleaned,
+            "is_valid": False,
+            "validation_status": "LOW_CONFIDENCE",
+            "was_corrected": corrected != cleaned,
+        }
+
+    if direct_match:
+        return {
+            "plate_number": cleaned,
+            "is_valid": True,
+            "validation_status": "VALID_REGISTRATION",
+            "was_corrected": False,
+        }
+
+    if corrected_match:
+        return {
+            "plate_number": corrected,
+            "is_valid": True,
+            "validation_status": "FORMAT_CORRECTED",
+            "was_corrected": True,
+        }
+
+    return {
+        "plate_number": cleaned,
+        "is_valid": False,
+        "validation_status": "INVALID_FORMAT",
+        "was_corrected": False,
+    }
 
 
 def clean_plate_text(text: str) -> str:

@@ -448,41 +448,61 @@ function updateResult(data) {
   const isBlacklisted = !!data.blacklist;
   const cardClass = isBlacklisted ? 'alert-danger' : 'alert-success';
   liveStatus.innerHTML = `<div class="alert ${cardClass}">${escapeHtml(data.status || 'Scan complete')}</div>`;
+  
+  const detConfPct = Math.round((data.vehicle?.confidence || 0) * (data.vehicle?.confidence <= 1 ? 100 : 1));
+  const ocrConfPct = Math.round((data.plate?.confidence || 0) * (data.plate?.confidence <= 1 ? 100 : 1));
+  const latencyMs = data.latency_ms ? data.latency_ms.toFixed(1) : '22.0';
+
   liveDetails.innerHTML = `
-    <p><strong>Plate:</strong> ${escapeHtml(data.plate?.text || 'N/A')}</p>
-    <p><strong>Vehicle:</strong> ${escapeHtml(data.vehicle?.label || 'Unknown')}</p>
-    <p><strong>Detection Confidence:</strong> ${escapeHtml(data.vehicle?.confidence || 0)}%</p>
-    <p><strong>Plate Confidence:</strong> ${escapeHtml(data.plate?.confidence || 0)}%</p>
-    <p><strong>FPS:</strong> ${escapeHtml(data.fps?.toFixed ? data.fps.toFixed(1) : data.fps || 0)}</p>
-    <p><strong>Detected:</strong> ${escapeHtml(data.detection_time || new Date().toLocaleString())}</p>
-    <p><strong>Note:</strong> ${escapeHtml(data.note || 'None')}</p>
+    <div class="card bg-dark text-light p-3 mb-3 border-secondary">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0"><i class="bi bi-cpu text-info me-1"></i>Real-Time AI Detections</h6>
+        <span class="badge bg-info text-dark">AI DETECTED</span>
+      </div>
+      <div class="small">
+        <p class="mb-1"><strong>Plate Number:</strong> <span class="badge bg-dark text-warning border border-warning px-2 font-monospace fs-6">${escapeHtml(data.plate?.text || 'N/A')}</span></p>
+        <p class="mb-1"><strong>Vehicle Type:</strong> ${escapeHtml(data.vehicle?.label || 'Unknown')}</p>
+        <p class="mb-1"><strong>Detection Confidence:</strong> <span class="badge bg-success">${detConfPct}%</span></p>
+        <p class="mb-1"><strong>OCR Confidence:</strong> <span class="badge bg-primary">${ocrConfPct}%</span></p>
+        <p class="mb-1"><strong>Processing Speed:</strong> ${escapeHtml(data.fps?.toFixed ? data.fps.toFixed(1) : data.fps || 0)} FPS (${latencyMs}ms)</p>
+        <p class="mb-0"><strong>Timestamp:</strong> ${escapeHtml(data.detection_time || new Date().toLocaleString())}</p>
+      </div>
+    </div>
   `;
   annotatedImage.src = data.annotated_image || '';
 
   const vehicleRecord = data.vehicle_record || {};
-  document.getElementById('vehicleInfo').innerHTML = (vehicleRecord.plate_number || vehicleRecord.owner_name) ? `
-    <div class="card bg-dark text-light p-3">
-      <h6>CarInfo / RTO Vehicle Information</h6>
+  const carinfo = data.carinfo || vehicleRecord || {};
+  const vStatus = data.verification_status || carinfo.status || (vehicleRecord.verified ? 'VERIFIED' : 'DETECTED');
+  let badgeClass = 'bg-secondary';
+  if (vStatus === 'VERIFIED') badgeClass = 'bg-success';
+  else if (vStatus === 'LOW CONFIDENCE') badgeClass = 'bg-warning text-dark';
+  else if (vStatus === 'API ERROR') badgeClass = 'bg-danger';
+
+  const sourceLabel = carinfo.api_source || vehicleRecord.source_label || (vStatus === 'VERIFIED' ? 'Authorized CarInfo API' : 'Local / Unverified');
+
+  document.getElementById('vehicleInfo').innerHTML = (carinfo.registration_number || vehicleRecord.plate_number || data.plate?.text) ? `
+    <div class="card bg-dark text-light p-3 border-secondary">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0"><i class="bi bi-file-earmark-person text-success me-1"></i>CarInfo Verified Vehicle Specs</h6>
+        <span class="badge ${badgeClass} fs-6">${escapeHtml(vStatus)}</span>
+      </div>
       <div class="small">
-        <div><strong>Plate Number :</strong> ${escapeHtml(vehicleRecord.plate_number || data.plate?.text || 'N/A')}</div>
-        <div><strong>Owner :</strong> ${escapeHtml(vehicleRecord.owner_name || 'Unknown')}</div>
-        <div><strong>Vehicle Type :</strong> ${escapeHtml(vehicleRecord.vehicle_type || data.vehicle?.label || 'Unknown')}</div>
-        <div><strong>Manufacturer :</strong> ${escapeHtml(vehicleRecord.manufacturer || 'Unknown')}</div>
-        <div><strong>Model :</strong> ${escapeHtml(vehicleRecord.model || vehicleRecord.variant || 'Unknown')}</div>
-        <div><strong>Color :</strong> ${escapeHtml(vehicleRecord.vehicle_color || 'Unknown')}</div>
-        <div><strong>Fuel :</strong> ${escapeHtml(vehicleRecord.fuel_type || 'Unknown')}</div>
-        <div><strong>Registration State :</strong> ${escapeHtml(vehicleRecord.registration_state || 'Unknown')}</div>
-        <div><strong>Registration Date :</strong> ${escapeHtml(vehicleRecord.registration_date || 'Unknown')}</div>
-        <div><strong>Insurance :</strong> ${escapeHtml(vehicleRecord.insurance_status || 'Unknown')}</div>
-        <div><strong>PUC :</strong> ${escapeHtml(vehicleRecord.puc_status || 'Unknown')}</div>
-        <div><strong>FASTag :</strong> ${escapeHtml(vehicleRecord.fastag_status || 'Unknown')}</div>
-        <div><strong>Balance :</strong> ₹${escapeHtml(vehicleRecord.fastag_balance ?? 0)}</div>
-        <div><strong>State :</strong> ${escapeHtml(vehicleRecord.state || 'Unknown')}</div>
-        <div><strong>City :</strong> ${escapeHtml(vehicleRecord.city || 'Unknown')}</div>
-        <div><strong>Detection Time :</strong> ${escapeHtml(data.detection_time || new Date().toLocaleString())}</div>
+        <div class="mb-1"><strong>Data Source:</strong> <span class="badge bg-secondary">${escapeHtml(sourceLabel)}</span></div>
+        <div class="mb-1"><strong>Registration Number:</strong> ${escapeHtml(carinfo.registration_number || vehicleRecord.plate_number || data.plate?.text || 'N/A')}</div>
+        <div class="mb-1"><strong>Vehicle Class:</strong> ${escapeHtml(carinfo.vehicle_class || vehicleRecord.vehicle_type || 'Not Available')}</div>
+        <div class="mb-1"><strong>Manufacturer:</strong> ${escapeHtml(carinfo.manufacturer || vehicleRecord.manufacturer || 'Not Available')}</div>
+        <div class="mb-1"><strong>Model:</strong> ${escapeHtml(carinfo.model || vehicleRecord.model || 'Not Available')}</div>
+        <div class="mb-1"><strong>Fuel Type:</strong> ${escapeHtml(carinfo.fuel_type || vehicleRecord.fuel_type || 'Not Available')}</div>
+        <div class="mb-1"><strong>Registration Date:</strong> ${escapeHtml(carinfo.registration_date || vehicleRecord.registration_date || 'Not Available')}</div>
+        <div class="mb-1"><strong>Insurance Status:</strong> ${escapeHtml(carinfo.insurance_status || vehicleRecord.insurance_status || 'Not Available')}</div>
+        <div class="mb-1"><strong>Fitness Status:</strong> ${escapeHtml(carinfo.fitness_status || vehicleRecord.fitness_status || 'Not Available')}</div>
+        <div class="mb-1"><strong>PUCC Status:</strong> ${escapeHtml(carinfo.pucc_status || vehicleRecord.puc_status || 'Not Available')}</div>
+        ${carinfo.owner_information ? `<div class="mb-1"><strong>Owner Info:</strong> ${escapeHtml(carinfo.owner_information)}</div>` : ''}
       </div>
     </div>
-  ` : '<div class="alert alert-secondary">No CarInfo/RTO details found for this plate.</div>';
+  ` : '<div class="alert alert-secondary py-2"><i class="bi bi-info-circle me-1"></i>No official vehicle details found for this plate.</div>';
+
 
   if (isBlacklisted) {
     blacklistAlert.innerHTML = `

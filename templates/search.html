@@ -19,35 +19,51 @@
   <div class="card-body">
     <div class="row">
       <div class="col-md-7">
+        <h5 class="card-title"><i class="bi bi-camera-video"></i> 🎥 ANPR Camera Detection History</h5>
         <table class="table table-dark table-striped">
-          <thead><tr><th>Plate</th><th>Vehicle</th><th>Date</th><th>Camera</th></tr></thead>
+          <thead><tr><th>Plate</th><th>Vision Vehicle</th><th>Date</th><th>Camera</th></tr></thead>
           <tbody>
             {% for item in results %}
-            <tr><td>{{ item.plate_number }}</td><td>{{ item.vehicle_type }}</td><td>{{ item.detection_date }}</td><td>{{ item.camera_name }}</td></tr>
+            <tr><td><span class="badge bg-primary fs-6">{{ item.plate_number }}</span></td><td>{{ item.vehicle_type }}</td><td>{{ item.detection_date }}</td><td>{{ item.camera_name }}</td></tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
       <div class="col-md-5">
         {% if vehicle_record %}
-        <h5>Vehicle Record</h5>
-        <p><strong>Plate:</strong> {{ vehicle_record.plate_number }}</p>
-        <p><strong>Owner:</strong> {{ vehicle_record.owner_name }}</p>
-        <p><strong>Type:</strong> {{ vehicle_record.vehicle_type }}</p>
-        <p><strong>Manufacturer:</strong> {{ vehicle_record.manufacturer }}</p>
-        <p><strong>Model:</strong> {{ vehicle_record.model }}</p>
-        <p><strong>Registration State:</strong> {{ vehicle_record.registration_state }}</p>
-        <p><strong>PUC Status:</strong> {{ vehicle_record.puc_status }}</p>
-        <p><strong>FASTag Balance:</strong> ₹{{ vehicle_record.fastag_balance }}</p>
-        <p><strong>FASTag Status:</strong> {{ vehicle_record.fastag_status }}</p>
-        {% if fastag_account %}
-        <hr>
-        <h6>FASTag Account</h6>
-        <p><strong>Balance:</strong> ₹{{ fastag_account.balance }}</p>
-        <p><strong>Status:</strong> {{ fastag_account.status }}</p>
-        {% endif %}
+        <div class="card bg-light text-dark">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title mb-0">📋 Vehicle Registration</h5>
+              {% if vehicle_record.verified %}
+                <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> VERIFIED</span>
+              {% else %}
+                <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle-fill"></i> NOT VERIFIED</span>
+              {% endif %}
+            </div>
+            <p class="mb-1"><strong>Data Source:</strong> <span class="badge bg-info text-dark">{{ vehicle_record.source_label or vehicle_record.source }}</span></p>
+            <p class="mb-1"><strong>Plate:</strong> {{ vehicle_record.plate_number }}</p>
+            <p class="mb-1"><strong>Owner:</strong> {{ vehicle_record.owner_name or 'Unavailable / Not Verified' }}</p>
+            <p class="mb-1"><strong>Type:</strong> {{ vehicle_record.vehicle_type or 'N/A' }}</p>
+            <p class="mb-1"><strong>Manufacturer:</strong> {{ vehicle_record.manufacturer or 'N/A' }}</p>
+            <p class="mb-1"><strong>Model:</strong> {{ vehicle_record.model or 'N/A' }}</p>
+            <p class="mb-1"><strong>Registration State:</strong> {{ vehicle_record.registration_state or 'N/A' }}</p>
+            <p class="mb-1"><strong>PUC Status:</strong> {{ vehicle_record.puc_status or 'N/A' }}</p>
+            <p class="mb-1"><strong>FASTag Balance:</strong> ₹{{ vehicle_record.fastag_balance or 0.0 }}</p>
+            <p class="mb-1"><strong>FASTag Status:</strong> {{ vehicle_record.fastag_status or 'N/A' }}</p>
+            {% if fastag_account %}
+            <hr>
+            <h6>FASTag Account</h6>
+            <p class="mb-1"><strong>Balance:</strong> ₹{{ fastag_account.balance }}</p>
+            <p class="mb-1"><strong>Status:</strong> {{ fastag_account.status }}</p>
+            {% endif %}
+          </div>
+        </div>
         {% else %}
-        <div class="text-muted">Enter a plate number and click Search to view vehicle details. Use "Lookup RTO Now" to fetch records asynchronously.</div>
+        <div class="alert alert-warning">
+          <strong><i class="bi bi-exclamation-circle-fill"></i> Vehicle details unavailable / not verified</strong><br>
+          <small>Enter a plate number and click Search to view vehicle details or perform an authorized RTO lookup.</small>
+        </div>
         {% endif %}
       </div>
     </div>
@@ -83,7 +99,6 @@ document.getElementById('lookupNowBtn').addEventListener('click', async () => {
       document.getElementById('rtoStatus').textContent = status.status;
       if (status.status === 'completed' || status.status === 'not_found' || status.status === 'error') {
         clearInterval(poll);
-        // reload page to pick up any new vehicle details
         setTimeout(() => location.reload(), 800);
       }
     }, 1000);

@@ -35,6 +35,30 @@ class Config:
     PLATE_MODEL_PATH = os.getenv("PLATE_MODEL_PATH", str(BASE_DIR / "models" / "license_plate_detector.pt"))
     PLATE_CROP_PADDING = int(os.getenv("PLATE_CROP_PADDING", "5"))
     PLATE_CONFIDENCE_THRESHOLD = float(os.getenv("PLATE_CONFIDENCE_THRESHOLD", "0.35"))
+
+    # Stage 4: Plate Cropping & Preprocessing Configurations
+    PLATE_PAD_X_PERCENT = float(os.getenv("PLATE_PAD_X_PERCENT", "0.06"))
+    PLATE_PAD_Y_PERCENT = float(os.getenv("PLATE_PAD_Y_PERCENT", "0.06"))
+    PLATE_MIN_WIDTH = int(os.getenv("PLATE_MIN_WIDTH", "60"))
+    PLATE_MIN_HEIGHT = int(os.getenv("PLATE_MIN_HEIGHT", "18"))
+    PLATE_MIN_ASPECT_RATIO = float(os.getenv("PLATE_MIN_ASPECT_RATIO", "2.0"))
+    PLATE_MAX_ASPECT_RATIO = float(os.getenv("PLATE_MAX_ASPECT_RATIO", "6.0"))
+    PERSPECTIVE_CORRECTION_ENABLED = os.getenv("PERSPECTIVE_CORRECTION_ENABLED", "True").lower() in ("1", "true", "yes")
+    PREPROCESSING_MULTI_VARIANT_ENABLED = os.getenv("PREPROCESSING_MULTI_VARIANT_ENABLED", "True").lower() in ("1", "true", "yes")
+
+    # Stage 6: Multi-Frame Tracker & Voting Configurations
+    TRACKER_MIN_OBSERVATIONS = int(os.getenv("TRACKER_MIN_OBSERVATIONS", "3"))
+    TRACKER_CONFIDENCE_THRESHOLD = float(os.getenv("TRACKER_CONFIDENCE_THRESHOLD", "0.45"))
+    TRACKER_TIMEOUT_SECONDS = float(os.getenv("TRACKER_TIMEOUT_SECONDS", "10.0"))
+
+    # Stage 7 & 10: Stream & Video Performance Configurations
+    FRAME_SKIP_INTERVAL = int(os.getenv("FRAME_SKIP_INTERVAL", "2"))
+    CAMERA_RECONNECT_INTERVAL = float(os.getenv("CAMERA_RECONNECT_INTERVAL", "3.0"))
+    MAX_FRAME_QUEUE_SIZE = int(os.getenv("MAX_FRAME_QUEUE_SIZE", "2"))
+    RTSP_TIMEOUT_MS = int(os.getenv("RTSP_TIMEOUT_MS", "3000"))
+    VIDEO_SAMPLE_INTERVAL = int(os.getenv("VIDEO_SAMPLE_INTERVAL", "2"))
+    VIDEO_ANALYZE_INTERVAL = int(os.getenv("VIDEO_ANALYZE_INTERVAL", "5"))
+
     DEBUG_MODE = os.getenv("DEBUG_MODE", "False").lower() in ("1", "true", "yes")
     DEBUG_FOLDER = os.getenv("DEBUG_FOLDER", str(BASE_DIR / "debug"))
 
@@ -50,5 +74,14 @@ class Config:
     RTO_API_CLIENT_SECRET = os.getenv("RTO_API_CLIENT_SECRET")
     RTO_API_TIMEOUT = float(os.getenv("RTO_API_TIMEOUT", "10"))
 
+    # CarInfo Authorized API Settings
+    CARINFO_API_URL = os.getenv("CARINFO_API_URL", "https://api.carinfo.app/v1/vehicle/details")
+    CARINFO_API_KEY = os.getenv("CARINFO_API_KEY", "")
+    CARINFO_API_SECRET = os.getenv("CARINFO_API_SECRET", "")
+    CARINFO_API_TOKEN = os.getenv("CARINFO_API_TOKEN", "")
+    CARINFO_TEST_MODE = os.getenv("CARINFO_TEST_MODE", "True").lower() in ("1", "true", "yes")
+    VEHICLE_API_CACHE_SECONDS = int(os.getenv("VEHICLE_API_CACHE_SECONDS", "300"))
+
     DEFAULT_ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
     DEFAULT_ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
+
